@@ -51,12 +51,16 @@
       padding: 10px 30px;
     }
 
-      #submit-button {
-      width: 100%;
-      max-width: 300px;
-      margin: 0 auto;
-      display: block;
-    }
+
+
+    #submit-button, .btn-outline-dark {
+    width: 100%;
+    max-width: 300px; /* Ensure both buttons have the same maximum width */
+    margin: 0 auto;
+    display: block;
+    padding: 10px 30px; /* Match padding for consistency */
+    text-align: center;
+  }
 
 
     .section-light {
@@ -103,7 +107,24 @@
                 <label>Password</label>
                 <input type="password" class="form-control" name="password" required>
               </div>
+              <div class="mb-3 d-none">
+                <label>Confirm Password</label>
+                <input type="password" class="form-control" name="confirm-password" required>
+                <span class="error-message"></span> <!-- Error message container -->
+              </div>
+              <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="show-password">
+                <label class="form-check-label" for="show-password">Show Password</label>
+              </div>
+              <!-- Google Sign-In Button -->
+              <button class="btn btn-outline-dark w-100 mb-3 mt-3" onclick="location.href='/auth/google'">
+                <img src="https://img.icons8.com/color/16/000000/google-logo.png"/> Sign in with Google
+              </button>
+
+              <div class="text-center mb-3">or</div>
               <button type="submit" class="btn btn-primary" id="submit-button">Login</button>
+             
+              
             </form>
             <p class="text-center mt-3">
               <span id="toggle-text">Don't have an account?</span>
@@ -122,25 +143,49 @@
     const submitButton = document.getElementById('submit-button');
     const toggleText = document.getElementById('toggle-text');
     const toggleLink = document.getElementById('toggle-link');
+    const topLoginButton = document.querySelector('.btn-outline-primary'); // Top-right login button
   
     toggleLink.addEventListener('click', (e) => {
       e.preventDefault();
-      if (formTitle.textContent === 'Login') {
-        formTitle.textContent = 'Sign Up';
-        nameField.classList.remove('d-none');
-        authForm.action = '/register';
-        submitButton.textContent = 'Create Account';
-        toggleText.textContent = 'Already have an account?';
-        toggleLink.textContent = 'Login';
-      } else {
-        formTitle.textContent = 'Login';
-        nameField.classList.add('d-none');
-        authForm.action = '/login';
-        submitButton.textContent = 'Login';
-        toggleText.textContent = "Don't have an account?";
-        toggleLink.textContent = 'Sign Up';
-      }
+      toggleForm();
     });
+  
+    topLoginButton.addEventListener('click', () => {
+      showLoginForm();
+    });
+  
+    function toggleForm() {
+  if (formTitle.textContent === 'Login') {
+    formTitle.textContent = 'Sign Up';
+    nameField.classList.remove('d-none');
+    authForm.action = '/register';
+    submitButton.textContent = 'Create Account';
+    toggleText.textContent = 'Already have an account?';
+    toggleLink.textContent = 'Login';
+    confirmPasswordInput.parentNode.classList.remove('d-none'); // Show confirm password field
+  } else {
+    showLoginForm();
+  }
+}
+
+function showLoginForm() {
+  formTitle.textContent = 'Login';
+  nameField.classList.add('d-none');
+  authForm.action = '/login';
+  submitButton.textContent = 'Login';
+  toggleText.textContent = "Don't have an account?";
+  toggleLink.textContent = 'Sign Up';
+  confirmPasswordInput.parentNode.classList.add('d-none'); // Hide confirm password field
+}
+
+const showPasswordCheckbox = document.getElementById('show-password');
+const passwordFields = document.querySelectorAll('input[type="password"]');
+
+showPasswordCheckbox.addEventListener('change', () => {
+  passwordFields.forEach((field) => {
+    field.type = showPasswordCheckbox.checked ? 'text' : 'password';
+  });
+});
   </script>
 
   <!-- Footer -->
@@ -149,6 +194,106 @@
       <p>© 2025 Mood Diary Analysis - Built by CITS5505 Group 32</p>
     </div>
   </footer>
+
+  <script>
+    const nameInput = document.querySelector('input[name="name"]');
+    const emailInput = document.querySelector('input[name="email"]');
+    const passwordInput = document.querySelector('input[name="password"]');
+  
+    // Error message spans
+    function createErrorSpan(input) {
+      let span = document.createElement('span');
+      span.style.color = 'red';
+      span.style.fontSize = '0.8rem';
+      span.classList.add('error-message');
+      input.parentNode.appendChild(span);
+      return span;
+    }
+  
+    let nameError = createErrorSpan(nameInput);
+    let emailError = createErrorSpan(emailInput);
+    let passwordError = createErrorSpan(passwordInput);
+  
+    // Name validation
+nameInput?.addEventListener('input', () => {
+  const name = nameInput.value.trim();
+  if (name === '') {
+    nameError.textContent = ''; // No error message for empty field
+  } else if (name.length > 30) {
+    nameError.textContent = 'Name must be at most 30 characters.';
+  } else if (!/^[A-Za-z\s]*$/.test(name)) {
+    nameError.textContent = 'Name can only contain letters and spaces.';
+  } else {
+    nameError.textContent = '';
+  }
+});
+
+// Email validation
+emailInput.addEventListener('input', () => {
+  const email = emailInput.value.trim();
+  if (email === '') {
+    emailError.textContent = ''; // No error message for empty field
+  } else {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    emailError.textContent = emailRegex.test(email) ? '' : 'Invalid email format.';
+  }
+});
+
+// Password validation
+passwordInput.addEventListener('input', () => {
+  const pwd = passwordInput.value;
+  if (pwd === '') {
+    passwordError.textContent = ''; // No error message for empty field
+  } else {
+    const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    passwordError.textContent = pwdRegex.test(pwd)
+      ? ''
+      : 'Password must be 8+ chars with upper, lower, digit & special char.';
+  }
+});
+
+const confirmPasswordInput = document.querySelector('input[name="confirm-password"]');
+let confirmPasswordError = createErrorSpan(confirmPasswordInput);
+
+// Confirm Password Validation
+confirmPasswordInput.addEventListener('input', () => {
+  const password = passwordInput.value;
+  const confirmPassword = confirmPasswordInput.value;
+
+  if (confirmPassword === '') {
+    confirmPasswordError.textContent = ''; // No error message for empty field
+  } else if (password !== confirmPassword) {
+    confirmPasswordError.textContent = 'Passwords do not match.';
+  } else {
+    confirmPasswordError.textContent = '';
+  }
+});
+
+  
+    // Update form submission check
+authForm.addEventListener('submit', (e) => {
+  const errors = document.querySelectorAll('.error-message');
+  let hasError = false;
+  errors.forEach(err => {
+    if (err.textContent !== '') hasError = true;
+  });
+
+  if (!nameField.classList.contains('d-none') && nameInput.value.trim() === '') {
+    nameError.textContent = 'Name is required.';
+    hasError = true;
+  }
+
+  if (passwordInput.value !== confirmPasswordInput.value) {
+    confirmPasswordError.textContent = 'Passwords do not match.';
+    hasError = true;
+  }
+
+  if (hasError) {
+    e.preventDefault();
+  }
+});
+  </script>
+  
 
 </body>
 </html>
