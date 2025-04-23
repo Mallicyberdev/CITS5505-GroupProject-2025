@@ -1,18 +1,17 @@
 body {
     font-family: 'Segoe UI', sans-serif;
     background: white;
-    min-height: 100vh;
     margin: 0;
+    min-height: 100vh;
 }
 
 /* Sidebar */
 .sidebar {
-    width: 300px;
+    width: 260px;
     background-color: #f8f9fa;
     border-right: 1px solid #dee2e6;
 }
 
-/* Navigation links */
 .sidebar .nav-link {
     display: flex;
     align-items: center;
@@ -28,28 +27,29 @@ body {
     text-align: center;
 }
 
-/* Hover effect */
 .sidebar .nav-link:hover {
     background-color: #e2e6ea;
     border-radius: 12px;
     text-decoration: none;
 }
 
-/* Padding for main content area */
-.upload-section {
-    max-width: auto;
-    margin: 20px auto;
-    padding: 20px 40px;
+/* 统一主内容区域 */
+.page-section {
+    padding: 30px 40px;
+    min-height: 100%;
 }
 
-/* Form styling */
+.page-section h2 {
+    font-size: 1.8rem;
+    margin: 0 0 25px;
+    color: #333;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Form */
 textarea.form-control {
     resize: vertical;
-}
-
-button[type="submit"] {
-    padding: 0.5rem 1.5rem;
-    font-size: 1rem;
 }
 
 button[type="submit"] {
@@ -68,4 +68,71 @@ button[type="submit"]:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
     opacity: 0.95;
+}
+
+/* Mood History */
+.mood-entry {
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+.mood-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.mood-title {
+    color: #333;
+}
+
+.mood-date {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.mood-text {
+    margin: 0;
+    color: #444;
+}
+
+/* Stats */
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 1rem;
+}
+
+.stat-label {
+    color: #333;
+}
+
+.stat-value {
+    color: #007acc;
+    font-weight: bold;
+}
+
+.explore-card {
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+.explore-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+}
+
+.explore-user {
+    font-weight: bold;
+    color: #333;
+}
+
+.explore-time {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 2px;
 }

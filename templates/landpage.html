@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mood Diary Analysis</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -57,7 +57,6 @@
     }
   </style>
 </head>
-
 <body>
 
   <!-- Navbar -->
@@ -97,9 +96,7 @@
                 <label>Password</label>
                 <input type="password" class="form-control" name="password" required>
               </div>
-              <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary" id="submit-button">Login</button>
-              </div>
+              <button type="submit" class="btn btn-primary w-100" id="submit-button">Login</button>
             </form>
             <p class="text-center mt-3">
               <span id="toggle-text">Don't have an account?</span>
@@ -112,35 +109,29 @@
   </section>
 
   <script>
-    // Get references to the elements in the form
-    const formTitle = document.getElementById('form-title'); // Title of the form (Login/Sign Up)
-    const nameField = document.getElementById('name-field'); // Name input field (hidden by default)
-    const authForm = document.getElementById('auth-form'); // The form element
-    const submitButton = document.getElementById('submit-button'); // Submit button
-    const toggleText = document.getElementById('toggle-text'); // Text above the toggle link
-    const toggleLink = document.getElementById('toggle-link'); // Link to toggle between Login and Sign Up
+    const formTitle = document.getElementById('form-title');
+    const nameField = document.getElementById('name-field');
+    const authForm = document.getElementById('auth-form');
+    const submitButton = document.getElementById('submit-button');
+    const toggleText = document.getElementById('toggle-text');
+    const toggleLink = document.getElementById('toggle-link');
 
-    // Add event listener to the toggle link
     toggleLink.addEventListener('click', (e) => {
-      e.preventDefault(); // Prevent the default link behavior
-
-      // Check the current form state and toggle between Login and Sign Up
+      e.preventDefault();
       if (formTitle.textContent === 'Login') {
-        // Switch to Sign Up form
-        formTitle.textContent = 'Sign Up'; // Update form title
-        nameField.classList.remove('d-none'); // Show the name input field
-        authForm.action = '/register'; // Change form action to register
-        submitButton.textContent = 'Create Account'; // Update button text
-        toggleText.textContent = 'Already have an account?'; // Update toggle text
-        toggleLink.textContent = 'Login'; // Update toggle link text
+        formTitle.textContent = 'Sign Up';
+        nameField.classList.remove('d-none');
+        authForm.action = '/register';
+        submitButton.textContent = 'Create Account';
+        toggleText.textContent = 'Already have an account?';
+        toggleLink.textContent = 'Login';
       } else {
-        // Switch to Login form
-        formTitle.textContent = 'Login'; // Update form title
-        nameField.classList.add('d-none'); // Hide the name input field
-        authForm.action = '/login'; // Change form action to login
-        submitButton.textContent = 'Login'; // Update button text
-        toggleText.textContent = "Don't have an account?"; // Update toggle text
-        toggleLink.textContent = 'Sign Up'; // Update toggle link text
+        formTitle.textContent = 'Login';
+        nameField.classList.add('d-none');
+        authForm.action = '/login';
+        submitButton.textContent = 'Login';
+        toggleText.textContent = "Don't have an account?";
+        toggleLink.textContent = 'Sign Up';
       }
     });
   </script>
@@ -153,5 +144,4 @@
   </footer>
 
 </body>
-
 </html>
