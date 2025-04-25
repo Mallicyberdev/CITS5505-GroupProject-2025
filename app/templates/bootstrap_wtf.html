@@ -1,0 +1,114 @@
+{# app/templates/bootstrap_wtf.html #}
+
+{% macro render_field(field, label_visible=true, form_type="basic", class="", container_class="mb-3") %}
+    {# Renders a single form field with Bootstrap 5 styling. #}
+    {% set field_class = class %}
+
+    {# Determine Bootstrap class based on field type #}
+    {% set field_bs_class = '' %}
+    {% set container_class = container_class %}
+
+    {% if field.type == 'BooleanField' %}
+        {% set field_bs_class = 'form-check-input' %}
+        {% set container_class = 'form-check mb-3' %}
+    {% elif field.type == 'RadioField' %}
+        {% set field_bs_class = 'form-check-input' %}
+    {% elif field.type == 'SubmitField' %}
+        {% set field_bs_class = 'btn btn-primary' %}
+        {% set container_class = '' %}
+    {% elif field.type == 'CSRFTokenField' %}
+        {% set container_class = '' %}
+    {% else %}
+        {% set field_bs_class = 'form-control' %}
+    {% endif %}
+
+    {# Add is-invalid class if errors exist #}
+    {% if field.errors %}
+        {% set field_bs_class = field_bs_class + ' is-invalid' %}
+    {% endif %}
+
+    {# Combine provided class with bootstrap class #}
+    {% set field_class = field_bs_class + ' ' + field_class %}
+
+    <div class="{{ container_class }}">
+        {% if field.type not in ['SubmitField', 'CSRFTokenField', 'BooleanField'] and label_visible %}
+            {{ field.label(class='form-label') }}
+        {% endif %}
+
+        {% if field.type == 'BooleanField' %}
+            {# Special handling for BooleanField (checkbox) #}
+            {{ field(class=field_class) }}
+            {% if label_visible %}
+                {# Label after input for checkboxes #}
+                {{ field.label(class='form-check-label', for=field.id) }}
+            {% endif %}
+        {% elif field.type == 'RadioField' %}
+            {# Basic rendering for RadioField - often needs custom loop in template #}
+            <ul class="list-unstyled">
+                {% for subfield in field %}
+                    <li class="form-check">
+                        {{ subfield(class=field_class) }}
+                        {{ subfield.label(class='form-check-label') }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% elif field.type != 'CSRFTokenField' %}
+            {# General rendering for most fields #}
+            {{ field(class=field_class) }}
+        {% endif %}
+
+        {# Display errors #}
+        {% if field.errors %}
+            <div class="invalid-feedback">
+                {{ field.errors | join(', ') }}
+            </div>
+        {% endif %}
+
+        {# Display description/help text #}
+        {% if field.description %}
+            <div class="form-text">
+                {{ field.description }}
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro quick_form(form, action="", method="post", enctype=None, button_map={}, form_type="basic", horizontal_columns=('lg', 2, 10), class="") %}
+    {# Renders a complete form using the render_field macro. #}
+    {% set form_class = class %}
+
+    <form
+            {% if action %}action="{{ action }}"{% endif %}
+            method="{{ method }}"
+            {% if enctype %}enctype="{{ enctype }}"{% endif %}
+            class="{{ form_class }}"
+            role="form"
+    >
+        {# Render CSRF token and other hidden fields first #}
+        {{ form.hidden_tag() }}
+
+        {# Iterate over form fields, excluding hidden ones already rendered #}
+        {% for field in form if not field.widget.input_type == 'hidden' %}
+            {% if field.type == 'SubmitField' %}
+                {# Handle submit buttons separately at the end or via button_map #}
+            {% else %}
+                {{ render_field(field, form_type=form_type) }}
+            {% endif %}
+        {% endfor %}
+
+        {# Render Submit buttons #}
+        {# Check for a default submit field #}
+        {% set submit_field = form.submit if 'submit' in form else None %}
+
+        {% if submit_field %}
+            {{ render_field(submit_field, class='btn btn-primary') }}
+        {% endif %}
+
+        {# Render additional buttons specified in button_map #}
+        {% for button_name, button_style in button_map.items() %}
+            {% if button_name in form %}
+                {{ render_field(form[button_name], class=button_style) }}
+            {% endif %}
+        {% endfor %}
+    </form>
+{% endmacro %}

@@ -1,6 +1,6 @@
 # run.py
 from app import create_app, db  # Import db if needed for shell context
-from app.models import User, DataSet  # Import models for shell context
+from app.models import User, DiaryEntry  # Import models for shell context
 
 app = create_app()
 
@@ -8,7 +8,7 @@ app = create_app()
 # Add shell context processor for `flask shell`
 @app.shell_context_processor
 def make_shell_context():
-    return {"db": db, "User": User, "DataSet": DataSet}
+    return {"db": db, "User": User, "DiaryEntry": DiaryEntry}
 
 
 if __name__ == "__main__":
