@@ -2,8 +2,7 @@
 
 ## Purpose
 
-This is the repository for our group project, a data analytics applicati$$on for "project".
-
+This is the repository for our group project, a data analytics application for "project".
 ## Group Members
 
 | UWA ID   | Name                              | GitHub Username |
