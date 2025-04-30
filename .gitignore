@@ -176,3 +176,6 @@ cython_debug/
 # IDE specific files
 .idea/
 .vscode/
+
+# macOS system files
+.DS_Store
