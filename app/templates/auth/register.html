@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% import 'bootstrap_wtf.html' as wtf %}
-
+{% block title %}Register{% endblock %}
 {% block content %}
-    <h1>Register</h1>
-    <div class="row">
-        <div class="col-md-6">
-            {{ wtf.quick_form(form) }}
-        </div>
+    <div class="form-container mt-5">
+        <h2 class="text-center mb-4">Register</h2>
+        {{ wtf.quick_form(form, action=url_for('auth.register'), button_map={'submit': 'btn btn-primary w-100'}) }}
+        <p class="text-center mt-3">
+            Already have an account? <a href="{{ url_for('auth.login') }}">Login</a>
+        </p>
     </div>
-    <p>Already have an account? <a href="{{ url_for('auth.login') }}">Click to Login!</a></p>
 {% endblock %}
