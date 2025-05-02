@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka&family=Quicksand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- nav -->
+    <div class="navbar">
+        <h1><a href="{{ url_for('home') }}" class="brand-link" title="Go to Home">Mood Diary</a></h1>
+        <div class="user-info">
+            <span class="login-text">
+                <i class="fas fa-user-circle"></i> <a href="{{ url_for('user_profile') }}">{{ username }}</a>
+            </span>
+            <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+        </div>
+    </div>
+
+    <!-- Diary Grid -->
+    <div class="diary-grid" id="diaryGrid">
+        {% for diary in diaries %}
+        <div class="diary-card" data-shared="{{ 'true' if diary.shared else 'false' }}" title="{{ 'Shared' if diary.shared else 'Private' }}">
+            <h4>{{ diary.title }}</h4>
+            <p>{{ diary.content }}</p>
+            <p class="post-time"><time datetime="{{ diary.datetime }}">{{ diary.datetime.strftime('%B %d, %Y, %I:%M %p') }}</time></p>
+            <a href="{{ url_for('edit_diary', diary_id=diary.id) }}" class="open-icon" title="Edit this diary">
+                <i class="fas fa-pen-to-square"></i>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- create button: + -->
+    <button class="new-diary-btn" title="Create a new mood diary" id="openModal">＋</button>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">×</span>
+            <h2>New Diary</h2>
+            <form class="upload-form" action="{{ url_for('upload') }}" method="POST">
+                <input type="text" name="title" placeholder="Title" required />
+                <textarea name="content" placeholder="How are you feeling today" rows="6" required></textarea>
+                <button type="submit">Upload</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</html>
