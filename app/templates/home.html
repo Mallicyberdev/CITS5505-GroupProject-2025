@@ -26,10 +26,12 @@
     <!-- Diary Grid -->
     <div class="diary-grid" id="diaryGrid">
         {% for diary in diaries %}
-        <div class="diary-card" data-shared="{{ 'true' if diary.shared else 'false' }}" title="{{ 'Shared' if diary.shared else 'Private' }}">
+        <div class="diary-card" data-shared="{{ 'true' if diary.shared else 'false' }}"
+            title="{{ 'Shared' if diary.shared else 'Private' }}">
             <h4>{{ diary.title }}</h4>
             <p>{{ diary.content }}</p>
-            <p class="post-time"><time datetime="{{ diary.datetime }}">{{ diary.datetime.strftime('%B %d, %Y, %I:%M %p') }}</time></p>
+            <p class="post-time"><time datetime="{{ diary.datetime }}">{{ diary.datetime.strftime('%B %d, %Y, %I:%M %p')
+                    }}</time></p>
             <a href="{{ url_for('edit_diary', diary_id=diary.id) }}" class="open-icon" title="Edit this diary">
                 <i class="fas fa-pen-to-square"></i>
             </a>
@@ -56,4 +58,5 @@
 </body>
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
 </html>
