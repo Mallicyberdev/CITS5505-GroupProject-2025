@@ -42,8 +42,8 @@ def create_app(config_class=Config):
 
     app.register_blueprint(auth_bp, url_prefix="/auth")
 
-    from .data_handling import bp as data_handling_bp
-
-    app.register_blueprint(data_handling_bp, url_prefix="/data")  # Add url_prefix
+    # from .data_handling import bp as data_handling_bp
+    #
+    # app.register_blueprint(data_handling_bp, url_prefix="/data")  # Add url_prefix
 
     return app
