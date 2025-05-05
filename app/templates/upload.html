@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Diary | Mood Diary{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    :root {
+        --primary-color: #8e44ad;
+        --primary-dark: #6c3483;
+        --text-color: #333;
+        --light-gray: #f5f5f5;
+        --white: #ffffff;
+    }
+    
+    .page-title {
+        text-align: center;
+        margin: 2rem 0;
+        color: var(--primary-color);
+    }
+    
+    .diary-editor {
+        background-color: var(--white);
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .title-input {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.2rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 1.5rem;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .content-input {
+        width: 100%;
+        min-height: 300px;
+        padding: 1rem;
+        font-size: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 1.5rem;
+        font-family: 'Poppins', sans-serif;
+        resize: vertical;
+    }
+    
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+    
+    .btn {
+        padding: 0.8rem 1.5rem;
+        border-radius: 5px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        color: var(--white);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+    }
+    
+    .btn-secondary {
+        background-color: #e0e0e0;
+        color: var(--text-color);
+    }
+    
+    .btn-secondary:hover {
+        background-color: #d0d0d0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Create New Diary Entry</h1>
+    
+    <div class="diary-editor">
+        <form method="POST" action="{{ url_for('diary.upload') }}">
+            {{ form.hidden_tag() }}
+            
+            {{ form.title(class="title-input", placeholder="Give your diary entry a title...") }}
+            {% if form.title.errors %}
+                <div class="error-message" style="color: red; margin-top: -1rem; margin-bottom: 1rem;">
+                    {{ form.title.errors[0] }}
+                </div>
+            {% endif %}
+            
+            {{ form.content(class="content-input", placeholder="Write about your day, your feelings, or anything you'd like to remember...") }}
+            {% if form.content.errors %}
+                <div class="error-message" style="color: red; margin-top: -1rem; margin-bottom: 1rem;">
+                    {{ form.content.errors[0] }}
+                </div>
+            {% endif %}
+            
+            <div class="action-buttons">
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for('main.index') }}'">Cancel</button>
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const titleInput = document.querySelector('.title-input');
+        const contentInput = document.querySelector('.content-input');
+        
+        // Client-side validation
+        form.addEventListener('submit', function(e) {
+            if (titleInput.value.trim() === '') {
+                e.preventDefault();
+                alert('Please enter a title for your diary entry');
+                titleInput.focus();
+                return;
+            }
+            
+            if (contentInput.value.trim() === '') {
+                e.preventDefault();
+                alert('Please write some content for your diary entry');
+                contentInput.focus();
+                return;
+            }
+            
+            // Additional validation can be added here
+        });
+    });
+</script>
+{% endblock %}
