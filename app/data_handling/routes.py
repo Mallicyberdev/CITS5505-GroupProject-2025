@@ -1,9 +1,12 @@
-from flask import request, jsonify, current_app
-from flask_login import login_required, current_user
-from werkzeug.utils import secure_filename
-from werkzeug.exceptions import RequestEntityTooLarge
-import os, tempfile, json
+# routes.py
+
 from pathlib import Path
+import tempfile
+
+from flask import request, jsonify
+from flask_login import login_required, current_user
+from werkzeug.exceptions import RequestEntityTooLarge
+from werkzeug.utils import secure_filename
 
 from . import bp
 from app import db
@@ -11,7 +14,7 @@ from app.models import DiaryEntry
 from .utils import validate_file
 
 ALLOWED_EXTENSIONS = {'txt', 'json', 'csv'}
-UPLOAD_PROGRESS = {}               # TODO: хранить во внешнем key‑value (Redis)
+UPLOAD_PROGRESS = {}               # TODO: 
 
 def allowed_file(filename: str) -> bool:
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -26,7 +29,7 @@ def upload_progress(upload_id):
 @bp.route('/upload', methods=['POST'])
 @login_required
 def upload_file():
-    upload_id = None          # ### FIX: объявляем заранее
+    upload_id = None         
     try:
         if 'file' not in request.files:
             return jsonify({'error': 'No file part'}), 400
@@ -47,12 +50,12 @@ def upload_file():
         upload_id = f"{current_user.id}_{filename}"
         UPLOAD_PROGRESS[upload_id] = {'status': 'processing', 'progress': 0}
 
-        # ---------- чтение с прогрессом, запись во временный файл ----------
-        total_size = request.content_length or 0          # ### FIX
+        
+        total_size = request.content_length or 0          
         bytes_read = 0
         tmp_path = Path(tempfile.gettempdir()) / upload_id
         with tmp_path.open('wb') as tmp:
-            for chunk in file.stream:                     # buffered iterator
+            for chunk in file.stream:                     
                 tmp.write(chunk)
                 bytes_read += len(chunk)
                 if total_size:
@@ -61,8 +64,8 @@ def upload_file():
                     progress = 0
                 UPLOAD_PROGRESS[upload_id]['progress'] = progress
 
-        # ---------- сохранение в БД (читаем текст) -------------------------
-        # предполагаем, что файл текстовый в UTF‑8
+        
+        
         with tmp_path.open('r', encoding='utf-8', errors='replace') as f:
             content = f.read()
 
@@ -88,6 +91,6 @@ def upload_file():
         return jsonify({'error': str(e)}), 500
 
     finally:
-        # ### FIX: корректная очистка
+        
         if upload_id and UPLOAD_PROGRESS.get(upload_id, {}).get('status') in {'completed', 'error'}:
             UPLOAD_PROGRESS.pop(upload_id, None)
