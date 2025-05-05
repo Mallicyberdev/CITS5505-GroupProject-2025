@@ -2,11 +2,21 @@
 {% import 'bootstrap_wtf.html' as wtf %}
 
 {% block content %}
-    <h1>Register</h1>
-    <div class="row">
-        <div class="col-md-6">
-            {{ wtf.quick_form(form) }}
+<section class="hero-section d-flex align-items-center">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card shadow-lg">
+                    <div class="card-body p-5">
+                        <h2 class="text-center mb-4" style="color: #8e44ad;">Register</h2>
+                        {{ wtf.quick_form(form) }}
+                        <div class="text-center mt-4">
+                            <p>Already have an account? <a href="{{ url_for('auth.login') }}" style="color: #8e44ad; font-weight: 600;">Login here</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <p>Already have an account? <a href="{{ url_for('auth.login') }}">Click to Login!</a></p>
+</section>
 {% endblock %}
