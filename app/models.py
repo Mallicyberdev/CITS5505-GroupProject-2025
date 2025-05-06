@@ -17,8 +17,8 @@ class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, unique=True, nullable=False)
-    email = db.Column(db.String(120), index=True, unique=True, nullable=False)
+    username = db.Column(db.String(32), index=True, unique=True, nullable=False)
+    email = db.Column(db.String(32), index=True, unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
 
     diaries = db.relationship(
@@ -44,13 +44,18 @@ class User(UserMixin, db.Model):
         return f'<User {self.username!r}>'
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))
+
+
 class DiaryEntry(db.Model):
     __tablename__ = 'diary_entries'
 
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    title = db.Column(db.String(200), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
 
     created_at = db.Column(
@@ -64,11 +69,19 @@ class DiaryEntry(db.Model):
         onupdate=func.now()
     )
 
-    # Optional fields for sentiment analysis
-    sentiment_score = db.Column(db.Float, nullable=True, index=True)
-    sentiment_label = db.Column(db.String(64), nullable=True, index=True)
-    sentiment_data = db.Column(db.JSON, nullable=True)
+    # --- Emotion Analysis Fields ---
 
+    # Store the label of the dominant (highest score) emotion
+    dominant_emotion_label = db.Column(db.String(64), nullable=True, index=True)
+
+    # Store the score of the dominant emotion
+    dominant_emotion_score = db.Column(db.Float, nullable=True, index=True)
+
+    # Store the full list of emotion labels and scores as JSON
+    # Use SQLAlchemy's JSON type, which handles backend differences (including SQLite)
+    emotion_details_json = db.Column(db.JSON, nullable=True)
+
+    # Flag to indicate if analysis has been performed
     analyzed = db.Column(
         db.Boolean,
         nullable=False,
@@ -80,7 +93,40 @@ class DiaryEntry(db.Model):
     def __repr__(self):
         return f'<DiaryEntry {self.id} owner={self.owner.username!r}>'
 
+    # --- Helper Method to Update Emotion Data ---
+    def update_emotion_analysis(self, analysis_result):
+        """
+        Updates the diary entry with emotion analysis results.
 
-@login_manager.user_loader
-def load_user(user_id):
-    return db.session.get(User, int(user_id))
+        Args:
+            analysis_result: The raw result from your analysis, expected to be
+                             like [[{'label': 'anger', 'score': 0.01}, ...]]
+        """
+        if not analysis_result or not isinstance(analysis_result, list) or not analysis_result[0]:
+            # Handle empty or invalid results
+            self.dominant_emotion_label = None
+            self.dominant_emotion_score = None
+            self.emotion_details_json = None
+            self.analyzed = True  # Mark as analyzed, even if result was empty/invalid
+            return
+
+        # --- IMPORTANT: Handle the nested list structure ---
+        # Your input is [[{...}, {...}]], we need the inner list [{...}, {...}]
+        emotion_scores = analysis_result[0]  # Get the actual list of scores
+
+        if not emotion_scores:
+            # Handle empty inner list
+            self.dominant_emotion_label = None
+            self.dominant_emotion_score = None
+            self.emotion_details_json = None
+            self.analyzed = True
+            return
+
+        # Find dominant emotion
+        dominant_emotion = max(emotion_scores, key=lambda item: item['score'])
+
+        # Update fields
+        self.dominant_emotion_label = dominant_emotion['label']
+        self.dominant_emotion_score = dominant_emotion['score']
+        self.emotion_details_json = emotion_scores  # Store the list of dicts
+        self.analyzed = True

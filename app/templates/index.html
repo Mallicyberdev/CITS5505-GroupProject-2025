@@ -1,20 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="px-4 py-5 my-5 text-center">
-        <h1 class="display-5 fw-bold">Data Analytics Platform</h1>
-        <div class="col-lg-6 mx-auto">
-            <p class="lead mb-4">Welcome! Upload your private data, get automated analysis, and share insights
-                selectively with colleagues or friends. Get started by creating an account or logging in.</p>
-            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                {% if current_user.is_anonymous %}
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4 gap-3">Register</a>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg px-4">Login</a>
-                {% else %}
-                    <a href="{{ url_for('data_handling.visualize') }}" class="btn btn-success btn-lg px-4">View My
-                        Data</a>
-                {% endif %}
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Track Your Mood, Transform Your Life</h1>
+            <p>Understand your emotions through daily insights and unlock a healthier, happier you.</p>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Start Your Journey</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container text-center">
+            <h2 class="mb-5" style="font-size: 32px; color: #333;">Features that Help You Grow</h2>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <i class="fas fa-pencil-alt"></i>
+                        <h3>Log Your Moods</h3>
+                        <p>Easily record your daily moods with quick and simple entries.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Track Your Progress</h3>
+                        <p>Visualize your mood trends over time and understand patterns.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <i class="fas fa-share-alt"></i>
+                        <h3>Share with Friends</h3>
+                        <p>Share your mood diary with friends or keep it private, your choice!</p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 {% endblock %}
