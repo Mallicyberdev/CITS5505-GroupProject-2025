@@ -1,42 +1,137 @@
 {% extends "base.html" %}
 
+{% block title %}Home – Mood Diary Analysis{% endblock %}
+
 {% block content %}
     <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="hero-content">
-            <h1>Track Your Mood, Transform Your Life</h1>
-            <p>Understand your emotions through daily insights and unlock a healthier, happier you.</p>
-            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Start Your Journey</a>
+    <section class="hero-section text-white d-flex align-items-center min-vh-75 pt-5 pb-5">
+        <div class="container text-center">
+            <h1 class="display-3 fw-bold mb-3 animate-fade-in-up">
+                Track Your Mood, Transform Your Life
+            </h1>
+            <p class="lead mb-4 pb-2 animate-fade-in-up" style="animation-delay: 0.2s;">
+                Gain clarity on your emotional landscape. Understand your triggers, celebrate your joys, and build a
+                more mindful existence with Mood Diary Analysis.
+            </p>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg animate-fade-in-up"
+               style="animation-delay: 0.4s;">
+                Start Your Free Journey
+            </a>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section class="features-section">
-        <div class="container text-center">
-            <h2 class="mb-5" style="font-size: 32px; color: #333;">Features that Help You Grow</h2>
-            <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="feature-card">
-                        <i class="fas fa-pencil-alt"></i>
-                        <h3>Log Your Moods</h3>
-                        <p>Easily record your daily moods with quick and simple entries.</p>
+    <section id="features" class="features-section py-5 bg-light-alt">
+        <div class="container">
+            <h2 class="text-center mb-5 section-title">
+                Features Designed for Insight
+            </h2>
+            <div class="row gy-4 justify-content-center">
+                <!-- Feature 1: Log Moods -->
+                <div class="col-md-6 col-lg-4 d-flex">
+                    <div class="feature-card h-100 w-100 text-center">
+                        <div class="mb-3 fs-1 text-primary feature-icon">
+                            <i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="h5 fw-semibold mb-2">Effortless Logging</h3>
+                        <p class="text-muted">Quickly record your mood, activities, and thoughts anytime, anywhere. Keep
+                            it simple or add detail – it's up to you.</p>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="feature-card">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>Track Your Progress</h3>
-                        <p>Visualize your mood trends over time and understand patterns.</p>
+                <!-- Feature 2: Track Progress -->
+                <div class="col-md-6 col-lg-4 d-flex">
+                    <div class="feature-card h-100 w-100 text-center">
+                        <div class="mb-3 fs-1 text-primary feature-icon">
+                            <i class="fas fa-chart-line fa-fw" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="h5 fw-semibold mb-2">Visualize Trends</h3>
+                        <p class="text-muted">See your emotional patterns unfold with intuitive charts and graphs.
+                            Identify correlations and understand your triggers.</p>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="feature-card">
-                        <i class="fas fa-share-alt"></i>
-                        <h3>Share with Friends</h3>
-                        <p>Share your mood diary with friends or keep it private, your choice!</p>
+                <!-- Feature 3: Gain Insights (Replaced Share) -->
+                <div class="col-md-6 col-lg-4 d-flex">
+                    <div class="feature-card h-100 w-100 text-center">
+                        <div class="mb-3 fs-1 text-primary feature-icon">
+                            <i class="fas fa-lightbulb fa-fw" aria-hidden="true"></i>
+                        </div>
+                        <h3 class="h5 fw-semibold mb-2">Personalized Insights</h3>
+                        <p class="text-muted">Receive gentle summaries and observations based on your entries to foster
+                            self-awareness and growth.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works-section py-5">
+        <div class="container">
+            <h2 class="text-center mb-5 section-title">How It Works</h2>
+            <div class="row gy-4 text-center">
+                <!-- Step 1 -->
+                <div class="col-md-4">
+                    <div class="step-icon mb-3 text-primary">
+                        <i class="fas fa-edit fa-3x"></i>
+                    </div>
+                    <h3 class="h5 fw-semibold mb-2">1. Log Daily</h3>
+                    <p class="text-muted">Take a moment each day to record how you're feeling and what you've been up
+                        to.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="col-md-4">
+                    <div class="step-icon mb-3 text-primary">
+                        <i class="fas fa-chart-pie fa-3x"></i>
+                    </div>
+                    <h3 class="h5 fw-semibold mb-2">2. Review Trends</h3>
+                    <p class="text-muted">Explore your dashboard to see visual summaries and patterns over time.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="col-md-4">
+                    <div class="step-icon mb-3 text-primary">
+                        <i class="fas fa-seedling fa-3x"></i>
+                    </div>
+                    <h3 class="h5 fw-semibold mb-2">3. Cultivate Awareness</h3>
+                    <p class="text-muted">Use the insights gained to better understand yourself and make positive
+                        changes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials-section py-5 bg-light-alt">
+        <div class="container">
+            <h2 class="text-center mb-5 section-title">What Users Say</h2>
+            <div class="row gy-4">
+                <div class="col-lg-6 d-flex">
+                    <blockquote class="blockquote testimonial-card p-4 h-100 w-100">
+                        <p class="mb-2">"This app has genuinely helped me understand my mood swings. Seeing the patterns
+                            laid out visually makes a huge difference."</p>
+                        <footer class="blockquote-footer mt-auto">Alex P.</footer>
+                    </blockquote>
+                </div>
+                <div class="col-lg-6 d-flex">
+                    <blockquote class="blockquote testimonial-card p-4 h-100 w-100">
+                        <p class="mb-2">"Simple to use, yet powerful. Logging takes seconds, but the insights I've
+                            gained over months are invaluable."</p>
+                        <footer class="blockquote-footer mt-auto">Samira K.</footer>
+                    </blockquote>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="cta-section py-5 text-center">
+        <div class="container">
+            <h2 class="mb-3 fw-bold">Ready to Understand Yourself Better?</h2>
+            <p class="lead mb-4 text-muted">Join thousands of others on the path to emotional clarity and
+                well-being.</p>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                Get Started Now - It's Free!
+            </a>
+        </div>
+    </section>
+
 {% endblock %}
