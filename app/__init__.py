@@ -1,7 +1,7 @@
 # app/__init__.py
 import os
 from flask import Flask
-from .extensions import db, login_manager
+from .extensions import db, migrate, login_manager
 from config import Config  # Import configurations
 
 
@@ -23,6 +23,7 @@ def create_app(config_class=Config):
 
     # Initialize Flask extensions
     db.init_app(app)
+    migrate.init_app(app, db)
     login_manager.init_app(app)
 
     # Create database tables if they don't exist (since not using Migrate)
@@ -42,8 +43,8 @@ def create_app(config_class=Config):
 
     app.register_blueprint(auth_bp, url_prefix="/auth")
 
-    from .data_handling import bp as data_handling_bp
-
-    app.register_blueprint(data_handling_bp, url_prefix="/data")  # Add url_prefix
+    # from .data_handling import bp as data_handling_bp
+    #
+    # app.register_blueprint(data_handling_bp, url_prefix="/data")  # Add url_prefix
 
     return app

@@ -14,3 +14,4 @@ class Config:
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
         instance_path if os.path.exists(instance_path) else basedir, "app.db"
     )
+    SQLALCHEMY_TRACK_MODIFICATIONS = False  # Disable track modifications to save memory
