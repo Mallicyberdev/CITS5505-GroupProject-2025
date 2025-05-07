@@ -8,3 +8,5 @@ email-validator>=2.2.0 # For email validation in WTForms
 python-dotenv>=1.1.0 # To load environment variables from .env file
 python-magic>=0.4.27  # For file type detection
 Flask-Migrate>=4.1.0 # For database migrations
+WTForms~=3.2.1
+alembic~=1.15.2
