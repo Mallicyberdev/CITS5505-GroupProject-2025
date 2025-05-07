@@ -1,62 +1,195 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka&family=Quicksand&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Diaries - Home</title>
+    <!-- Bootstrap CSS -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
+            crossorigin="anonymous"
+    >
+    <!-- Bootstrap Icons (for FAB icon) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.12.1/font/bootstrap-icons.css">
 
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light background for contrast */
+            padding-top: 1.5rem; /* Add some top padding now that navbar is gone */
+            padding-bottom: 1.5rem; /* Add some bottom padding */
+        }
+
+        .diary-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .diary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15) !important;
+        }
+
+        .emotion-badge {
+            font-size: 0.8em;
+        }
+
+        /* Floating Action Button (FAB) Styles */
+        .fab-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 1030; /* Ensure it's above other content */
+        }
+
+        .fab-container .dropdown-toggle::after {
+            display: none; /* Hide default Bootstrap dropdown arrow */
+        }
+
+        .fab-main-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            font-size: 1.5rem; /* Icon size */
+            line-height: 1; /* Center icon vertically */
+        }
+
+        /* Optional: style for dropdown items */
+        .fab-container .dropdown-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .fab-container .dropdown-item .bi {
+            margin-right: 0.5rem;
+        }
+
+    </style>
+</head>
 <body>
 
-    <!-- nav -->
-    <div class="navbar">
-        <h1><a href="{{ url_for('home') }}" class="brand-link" title="Go to Home">Mood Diary</a></h1>
-        <div class="user-info">
-            <span class="login-text">
-                <i class="fas fa-user-circle"></i> <a href="{{ url_for('user_profile') }}">{{ username }}</a>
-            </span>
-            <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
-        </div>
+<!-- Main Content -->
+<div class="container">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Mood Diary</h1>
     </div>
 
-    <!-- Diary Grid -->
-    <div class="diary-grid" id="diaryGrid">
-        {% for diary in diaries %}
-        <div class="diary-card" data-shared="{{ 'true' if diary.shared else 'false' }}"
-            title="{{ 'Shared' if diary.shared else 'Private' }}">
-            <h4>{{ diary.title }}</h4>
-            <p>{{ diary.content }}</p>
-            <p class="post-time"><time datetime="{{ diary.datetime }}">{{ diary.datetime.strftime('%B %d, %Y, %I:%M %p')
-                    }}</time></p>
-            <a href="{{ url_for('edit_diary', diary_id=diary.id) }}" class="open-icon" title="Edit this diary">
-                <i class="fas fa-pen-to-square"></i>
-            </a>
+    {% if diaries %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for diary in diaries %}
+                <div class="col">
+                    <div class="card h-100 diary-card shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ diary.title }}</h5>
+                            <p class="card-text text-muted small">
+                                Owner: {{ diary.owner.username }}
+                                {% if diary.owner_id != current_user.id %}
+                                    (Shared)
+                                {% endif %}
+                            </p>
+                            <p class="card-text flex-grow-1">
+                                {{ diary.content[:150] }}{% if diary.content|length > 150 %}...{% endif %}</p>
+
+                            {% if diary.analyzed and diary.dominant_emotion_label %}
+                                <p class="card-text mb-2">
+                                <span class="badge rounded-pill
+                                    {% if diary.dominant_emotion_label == 'joy' or diary.dominant_emotion_label == 'love' %} bg-success
+                                    {% elif diary.dominant_emotion_label == 'sadness' or diary.dominant_emotion_label == 'fear' %} bg-info text-dark
+                                    {% elif diary.dominant_emotion_label == 'anger' %} bg-danger
+                                    {% elif diary.dominant_emotion_label == 'surprise' %} bg-warning text-dark
+                                    {% else %} bg-secondary
+                                    {% endif %} emotion-badge">
+                                    Emotion: {{ diary.dominant_emotion_label }} ({{ "%.0f"|format(diary.dominant_emotion_score * 100) }}%)
+                                </span>
+                                </p>
+                            {% elif diary.analyzed %}
+                                <p class="card-text mb-2"><span
+                                        class="badge rounded-pill bg-light text-dark emotion-badge">Emotion: Not Detected</span>
+                                </p>
+                            {% else %}
+                                <p class="card-text mb-2"><span
+                                        class="badge rounded-pill bg-light text-dark emotion-badge">Emotion: Not Analyzed</span>
+                                </p>
+                            {% endif %}
+
+                            <p class="card-text mt-auto"><small
+                                    class="text-muted">Created: {{ diary.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </p>
+
+                            {#                            <div class="mt-2">#}
+                            {#                                <a href="{{ url_for('diary.view_diary', diary_id=diary.id) }}"#}
+                            {#                                   class="btn btn-sm btn-outline-secondary me-1">View Details</a>#}
+                            {#                                {% if diary.owner_id == current_user.id %}#}
+                            {#                                    <a href="{{ url_for('diary.edit_diary', diary_id=diary.id) }}"#}
+                            {#                                       class="btn btn-sm btn-primary">Edit</a>#}
+                            {#                                {% endif %}#}
+                            {# Add share button if you implement sharing functionality #}
+                            {# {% if diary.owner_id == current_user.id %}
+{#                                <a href="{{ url_for('diary.share_diary', diary_id=diary.id) }}" class="btn btn-sm btn-outline-info ms-1">Share</a>#}
+                            {#                                {% endif %} #}
+                            {#                            </div>#}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-
-    <!-- create button: + -->
-    <button class="new-diary-btn" title="Create a new mood diary" id="openModal">＋</button>
-
-    <!-- Upload Modal -->
-    <div id="uploadModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeModal">×</span>
-            <h2>New Diary</h2>
-            <form class="upload-form" action="{{ url_for('upload') }}" method="POST">
-                <input type="text" name="title" placeholder="Title" required />
-                <textarea name="content" placeholder="How are you feeling today" rows="6" required></textarea>
-                <button type="submit">Upload</button>
-            </form>
+    {% else %}
+        <div class="text-center mt-5">
+            <p class="lead">No diaries found yet.</p>
+            <p>Why not start by creating your first one?</p>
+            {#            <a href="{{ url_for('diary.create_diary') }}" class="btn btn-lg btn-success">#}
+            {#                <i class="bi bi-journal-plus"></i> Create New Diary#}
+            {#            </a>#}
         </div>
-    </div>
+    {% endif %}
+</div>
 
+<!-- Floating Action Button Menu -->
+{% if current_user.is_authenticated %}
+    <div class="fab-container dropup"> {# 'dropup' to make menu open upwards #}
+        <button class="btn btn-primary shadow-lg fab-main-btn dropdown-toggle" type="button" id="fabMenuButton"
+                data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-list"></i> {# Menu icon, or bi-person for user, bi-plus for add #}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end mb-2" aria-labelledby="fabMenuButton">
+            {# dropdown-menu-end to align right #}
+            <li>
+                <h6 class="dropdown-header">
+                    <i class="bi bi-person-circle"></i> {{ current_user.username }}
+                </h6>
+            </li>
+            <li>
+                {#                <a class="dropdown-item" href="{{ url_for('diary.create_diary') }}">#}
+                {#                    <i class="bi bi-journal-plus"></i> New Diary#}
+                {#                </a>#}
+            </li>
+            <li><a class="dropdown-item" href="#"> <i class="bi bi-person-fill-gear"></i> Profile</a></li>
+            {# Placeholder #}
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li>
+                <a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+{% else %}
+    {# Optionally, a FAB for login if user is not authenticated #}
+    <div class="fab-container">
+        <a href="{{ url_for('auth.login') }}" class="btn btn-primary shadow-lg fab-main-btn" title="Login">
+            <i class="bi bi-box-arrow-in-right"></i>
+        </a>
+    </div>
+{% endif %}
+
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+        crossorigin="anonymous"
+></script>
 </body>
-
-<script src="{{ url_for('static', filename='js/home_script.js') }}"></script>
-
 </html>
