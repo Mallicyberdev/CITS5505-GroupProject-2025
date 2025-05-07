@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% import 'bootstrap_wtf.html' as wtf %}
+
+{% block title %}Diary Details - Mood Diary Analysis{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, var(--color-bg), var(--color-bg-alt));
+    }
+    .card {
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid var(--color-border);
+        border-radius: 1rem;
+        padding: 2rem 2.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+    @media (prefers-color-scheme: dark) {
+        .card {
+            background: rgba(62, 62, 102, 0.95);
+        }
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+    .text-content {
+        color: var(--color-text);
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        margin-right: 0.5rem;
+        animation: pulse 2s infinite;
+    }
+    .badge-orange {
+        background: linear-gradient(45deg, #f39c12, #e67e22);
+        color: #fff;
+    }
+    .badge-teal {
+        background: linear-gradient(45deg, #1abc9c, #16a085);
+        color: #fff;
+    }
+    .badge-red {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        color: #fff;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    .mood-diagram-placeholder {
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, #ff6f61, #6b48ff);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 0.9rem;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(107, 72, 255, 0.5);
+        animation: glow 3s infinite;
+    }
+    @keyframes glow {
+        0% { box-shadow: 0 0 10px rgba(107, 72, 255, 0.5); }
+        50% { box-shadow: 0 0 30px rgba(107, 72, 255, 0.8); }
+        100% { box-shadow: 0 0 10px rgba(107, 72, 255, 0.5); }
+    }
+    .btn-reupload {
+        background: linear-gradient(90deg, #f39c12, #e67e22);
+        border: none;
+        color: #ffffff;
+        clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        padding: 0.8rem 2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+    }
+    .btn-reupload:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 6px 20px rgba(230, 126, 34, 0.5);
+    }
+    footer {
+        background: linear-gradient(90deg, #212529, #2c2c2c);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Main Content: Diary Details -->
+        <div class="col-lg-8">
+            <h1 class="mb-4 fw-bold">Diary Entry Details</h1>
+            <div class="card p-4 mb-4 shadow-sm">
+                <h3 class="h5 fw-semibold mb-3">Title</h3>
+                <p class="text-content mb-3">{{ diary.title }}</p>
+                <h3 class="h5 fw-semibold mb-3">Content</h3>
+                <p class="text-content mb-3">{{ diary.content }}</p>
+                <hr>
+                <h3 class="h5 fw-semibold mb-3">Mood Tags</h3>
+                <div class="mb-3 d-flex flex-wrap">
+                    {% if diary.analyzed and diary.emotion_details_json %}
+                        {% for emotion in diary.emotion_details_json %}
+                            {% set badge_class = "badge-orange" if loop.index0 == 0 else "badge-teal" if loop.index0 == 1 else "badge-red" %}
+                            <span class="badge {{ badge_class }}">{{ emotion.label }} ({{ '%.2f' % emotion.score }})</span>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-content">No emotion analysis available.</p>
+                    {% endif %}
+                </div>
+                <div class="d-flex align-items-start">
+                    <div class="flex-grow-1">
+                        <h3 class="h5 fw-semibold mb-3">Edit Entry</h3>
+                        {{ wtf.quick_form(form, action=url_for('main.details', diary_id=diary.id), button_map={'submit': 'btn btn-primary btn-lg'}) }}
+                    </div>
+                    <div class="mood-diagram-placeholder ms-4">
+                        <span>Mood Glow</span>
+                    </div>
+                </div>
+                <div class="mt-4 text-end">
+                    <button class="btn btn-reupload">Re-Upload</button>
+                </div>
+            </div>
+        </div>
+        <!-- Sidebar: Share List -->
+        <div class="col-lg-4">
+            <div class="card p-4 shadow-sm sticky-top">
+                <h3 class="h5 fw-semibold mb-3">Share List</h3>
+                {% if diary.shared_with %}
+                    <ul class="list-unstyled">
+                        {% for user in diary.shared_with %}
+                            <li class="mb-2 d-flex align-items-center">
+                                <input type="checkbox" class="me-2" id="user_{{ loop.index }}">
+                                <label for="user_{{ loop.index }}" class="text-content">{{ user.username }}</label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-content">This diary entry is not shared with anyone.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
