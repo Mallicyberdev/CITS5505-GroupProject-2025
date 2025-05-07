@@ -116,18 +116,14 @@
                                     class="text-muted">Created: {{ diary.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
                             </p>
 
-                            {#                            <div class="mt-2">#}
-                            {#                                <a href="{{ url_for('diary.view_diary', diary_id=diary.id) }}"#}
-                            {#                                   class="btn btn-sm btn-outline-secondary me-1">View Details</a>#}
-                            {#                                {% if diary.owner_id == current_user.id %}#}
-                            {#                                    <a href="{{ url_for('diary.edit_diary', diary_id=diary.id) }}"#}
-                            {#                                       class="btn btn-sm btn-primary">Edit</a>#}
-                            {#                                {% endif %}#}
-                            {# Add share button if you implement sharing functionality #}
-                            {# {% if diary.owner_id == current_user.id %}
-{#                                <a href="{{ url_for('diary.share_diary', diary_id=diary.id) }}" class="btn btn-sm btn-outline-info ms-1">Share</a>#}
-                            {#                                {% endif %} #}
-                            {#                            </div>#}
+                            <div class="mt-2">
+                                <a href="{{ url_for('data_handling.view_diary', diary_id=diary.id) }}"
+                                   class="btn btn-sm btn-outline-secondary me-1">View Details</a>
+                                {% if diary.owner_id == current_user.id %}
+                                    <a href="{{ url_for('data_handling.edit_diary', diary_id=diary.id) }}"
+                                       class="btn btn-sm btn-primary">Edit</a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -137,9 +133,9 @@
         <div class="text-center mt-5">
             <p class="lead">No diaries found yet.</p>
             <p>Why not start by creating your first one?</p>
-            {#            <a href="{{ url_for('diary.create_diary') }}" class="btn btn-lg btn-success">#}
-            {#                <i class="bi bi-journal-plus"></i> Create New Diary#}
-            {#            </a>#}
+            <a href="{{ url_for('data_handling.create_diary') }}" class="btn btn-lg btn-success">
+                <i class="bi bi-journal-plus"></i> Create New Diary
+            </a>
         </div>
     {% endif %}
 </div>
@@ -159,9 +155,9 @@
                 </h6>
             </li>
             <li>
-                {#                <a class="dropdown-item" href="{{ url_for('diary.create_diary') }}">#}
-                {#                    <i class="bi bi-journal-plus"></i> New Diary#}
-                {#                </a>#}
+                <a class="dropdown-item" href="{{ url_for('data_handling.create_diary') }}">
+                    <i class="bi bi-journal-plus"></i> New Diary
+                </a>
             </li>
             <li><a class="dropdown-item" href="#"> <i class="bi bi-person-fill-gear"></i> Profile</a></li>
             {# Placeholder #}

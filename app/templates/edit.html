@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }} - Mood Diary</title>
+    <!-- Bootstrap CSS -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
+            crossorigin="anonymous"
+    >
+    <!-- Bootstrap Icons (for FAB icon) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.12.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 2rem;
+            padding-bottom: 8rem; /* Extra padding at bottom to avoid FAB covering form controls */
+        }
+
+        .form-control-lg {
+            font-size: 1.1rem;
+        }
+
+        textarea.form-control-lg {
+            min-height: 200px;
+        }
+
+        .fab-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 1030;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .fab-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="text-center mb-4">
+                <h1 class="display-5">{{ title }}</h1>
+                <p class="text-muted">Editing: <em>{{ diary_entry.title }}</em></p>
+            </div>
+
+            {# Assuming you are using Flask-WTF and passing 'form' object #}
+            <form method="POST" action="{{ url_for('data_handling.edit_diary', diary_id=diary_entry.id) }}"
+                  id="diaryEditForm">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-4">
+                    {{ form.title.label(class="form-label fs-5") }}
+                    {{ form.title(class="form-control form-control-lg" + (" is-invalid" if form.title.errors else ""), placeholder="Enter a captivating title") }}
+                    {% for error in form.title.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.content.label(class="form-label fs-5") }}
+                    {{ form.content(class="form-control form-control-lg" + (" is-invalid" if form.content.errors else ""), rows="10", placeholder="Pour your thoughts out here...") }}
+                    {% for error in form.content.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Action Buttons -->
+<div class="fab-container">
+    <a href="{{ url_for('data_handling.view_diary', diary_id=diary_entry.id) }}"
+       class="btn btn-secondary shadow fab-btn" title="Cancel and View Diary">
+        <i class="bi bi-x-lg"></i>
+    </a>
+    <button type="submit" form="diaryEditForm" class="btn btn-success shadow fab-btn" title="Save Changes">
+        <i class="bi bi-check-lg"></i>
+    </button>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+        crossorigin="anonymous"
+></script>
+</body>
+</html>
