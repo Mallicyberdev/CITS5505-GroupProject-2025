@@ -2,64 +2,84 @@
 
 {% macro render_field(field, label_visible=true, form_type="basic", class="", container_class="mb-3") %}
     {# Renders a single form field with Bootstrap 5 styling. #}
-    {% set field_class = class %}
+    {% set arg_class = class %} {# Explicitly capture the passed 'class' argument #}
 
     {# Determine Bootstrap class based on field type #}
-    {% set field_bs_class = '' %}
-    {% set container_class = container_class %}
+    {% set field_default_bs_class = '' %}
+    {% set current_container_class = container_class %}
 
     {% if field.type == 'BooleanField' %}
-        {% set field_bs_class = 'form-check-input' %}
-        {% set container_class = 'form-check mb-3' %}
+        {% set field_default_bs_class = 'form-check-input' %}
+        {% set current_container_class = 'form-check mb-3' %}
     {% elif field.type == 'RadioField' %}
-        {% set field_bs_class = 'form-check-input' %}
+        {% set field_default_bs_class = 'form-check-input' %}
+        {# Container class for RadioField is usually handled by the list items #}
     {% elif field.type == 'SubmitField' %}
-        {% set field_bs_class = 'btn btn-primary' %}
-        {% set container_class = '' %}
+        {#
+          For SubmitField:
+          1. Base class is 'btn'.
+          2. If arg_class provides a 'btn-STYLE' (e.g., 'btn-danger'), that style is used.
+          3. If arg_class is empty or doesn't provide a 'btn-STYLE' (e.g., just 'w-100'),
+             then 'btn-primary' is used as the default style.
+        #}
+        {% set field_default_bs_class = 'btn' %} {# Always start with 'btn' #}
+        {% if not (arg_class and ('btn-primary' in arg_class or 'btn-secondary' in arg_class or 'btn-success' in arg_class or 'btn-danger' in arg_class or 'btn-warning' in arg_class or 'btn-info' in arg_class or 'btn-light' in arg_class or 'btn-dark' in arg_class or 'btn-link' in arg_class)) %}
+            {# If arg_class is empty OR does not contain a specific Bootstrap button style, add btn-primary #}
+            {% set field_default_bs_class = field_default_bs_class + ' btn-primary' %}
+        {% endif %}
+        {% set current_container_class = '' %}
+        {# Submit buttons don't usually need a wrapping div with margins like other fields #}
     {% elif field.type == 'CSRFTokenField' %}
-        {% set container_class = '' %}
+        {% set current_container_class = '' %}
     {% else %}
-        {% set field_bs_class = 'form-control' %}
+        {% set field_default_bs_class = 'form-control' %}
     {% endif %}
 
-    {# Add is-invalid class if errors exist #}
-    {% if field.errors %}
-        {% set field_bs_class = field_bs_class + ' is-invalid' %}
+    {# Build the final class list for the field, ensuring no duplicates #}
+    {% set final_classes_list = [] %}
+    {% if field_default_bs_class %}{% for cls in field_default_bs_class.split(' ') %}
+        {% if final_classes_list.append(cls) %}{% endif %}{% endfor %}{% endif %}
+    {% if arg_class %}{% for cls in arg_class.split(' ') %}{% if final_classes_list.append(cls) %}{% endif %}
+    {% endfor %}{% endif %}
+    {% set final_field_class = final_classes_list | unique | join(' ') %}
+
+
+    {# Add is-invalid class if errors exist AND it's not a submit button (buttons don't show validation states) #}
+    {% if field.errors and field.type != 'SubmitField' %}
+        {% set final_field_class = (final_field_class.split(' ') + ['is-invalid']) | unique | join(' ') %}
     {% endif %}
 
-    {# Combine provided class with bootstrap class #}
-    {% set field_class = field_bs_class + ' ' + field_class %}
-
-    <div class="{{ container_class }}">
+    <div class="{{ current_container_class }}">
         {% if field.type not in ['SubmitField', 'CSRFTokenField', 'BooleanField'] and label_visible %}
             {{ field.label(class='form-label') }}
         {% endif %}
 
         {% if field.type == 'BooleanField' %}
             {# Special handling for BooleanField (checkbox) #}
-            {{ field(class=field_class) }}
+            {{ field(class=final_field_class) }}
             {% if label_visible %}
                 {# Label after input for checkboxes #}
                 {{ field.label(class='form-check-label', for=field.id) }}
             {% endif %}
         {% elif field.type == 'RadioField' %}
-            {# Basic rendering for RadioField - often needs custom loop in template #}
-            <ul class="list-unstyled">
-                {% for subfield in field %}
-                    <li class="form-check">
-                        {{ subfield(class=field_class) }}
-                        {{ subfield.label(class='form-check-label') }}
-                    </li>
-                {% endfor %}
-            </ul>
+            {# Basic rendering for RadioField - often needs custom loop in template for better layout control #}
+            {# This default rendering places each radio in its own check wrapper #}
+            {% if label_visible and field.label.text %} {{ field.label(class='form-label d-block') }} {% endif %}
+            {# Main label for the group #}
+            {% for subfield in field %}
+                <div class="form-check {{ 'form-check-inline' if form_type == 'inline' else '' }}">
+                    {{ subfield(class=final_field_class) }}
+                    {{ subfield.label(class='form-check-label') }}
+                </div>
+            {% endfor %}
         {% elif field.type != 'CSRFTokenField' %}
             {# General rendering for most fields #}
-            {{ field(class=field_class) }}
+            {{ field(class=final_field_class) }}
         {% endif %}
 
         {# Display errors #}
         {% if field.errors %}
-            <div class="invalid-feedback">
+            <div class="invalid-feedback d-block"> {# d-block ensures feedback is shown for radios/checks too #}
                 {{ field.errors | join(', ') }}
             </div>
         {% endif %}
@@ -87,28 +107,31 @@
         {# Render CSRF token and other hidden fields first #}
         {{ form.hidden_tag() }}
 
-        {# Iterate over form fields, excluding hidden ones already rendered #}
-        {% for field in form if not field.widget.input_type == 'hidden' %}
-            {% if field.type == 'SubmitField' %}
-                {# Handle submit buttons separately at the end or via button_map #}
-            {% else %}
-                {{ render_field(field, form_type=form_type) }}
-            {% endif %}
+        {# Iterate over form fields, excluding hidden ones and submit buttons (rendered later) #}
+        {% for field in form if not field.widget.input_type == 'hidden' and field.type != 'SubmitField' %}
+            {{ render_field(field, form_type=form_type) }}
         {% endfor %}
 
         {# Render Submit buttons #}
-        {# Check for a default submit field #}
-        {% set submit_field = form.submit if 'submit' in form else None %}
+        {% set rendered_buttons = [] %} {# Keep track of rendered buttons to avoid duplication #}
 
-        {% if submit_field %}
-            {{ render_field(submit_field, class='btn btn-primary') }}
+        {# 1. Buttons specified in button_map take precedence #}
+        {% for button_name, button_extra_class in button_map.items() %}
+            {% if button_name in form and form[button_name].type == 'SubmitField' %}
+                {{ render_field(form[button_name], class=button_extra_class) }}
+                {% if rendered_buttons.append(button_name) %}{% endif %} {# Mark as rendered #}
+            {% endif %}
+        {% endfor %}
+
+        {# 2. Render the default 'submit' button if it exists, is a SubmitField, and wasn't handled by button_map #}
+        {% if 'submit' in form and form.submit.type == 'SubmitField' and 'submit' not in rendered_buttons %}
+            {{ render_field(form.submit) }} {# render_field will apply default 'btn btn-primary' #}
+            {% if rendered_buttons.append('submit') %}{% endif %}
         {% endif %}
 
-        {# Render additional buttons specified in button_map #}
-        {% for button_name, button_style in button_map.items() %}
-            {% if button_name in form %}
-                {{ render_field(form[button_name], class=button_style) }}
-            {% endif %}
+        {# 3. Render any other SubmitFields in the form that haven't been rendered yet #}
+        {% for field in form if field.type == 'SubmitField' and field.name not in rendered_buttons %}
+            {{ render_field(field) }} {# Render with default styling #}
         {% endfor %}
     </form>
 {% endmacro %}
