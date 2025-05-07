@@ -123,6 +123,15 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center; /* Keep vertical alignment */
 }
 
+.hero-section .text-light a {
+    color: #e0e0e0;
+}
+
+.hero-section .text-light a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
 /* Add RGB for secondary color */
 :root {
     /* ... existing vars */
