@@ -5,13 +5,16 @@
     --color-primary: #8e44ad; /* Purple */
     --color-primary-rgb: 142, 68, 173;
     --color-secondary: #6c3483; /* Darker Purple */
+    --color-secondary-rgb: 108, 52, 131;
     --color-bg: #ffffff; /* Lighter background */
     --color-bg-alt: #f8f9fa; /* Very light gray for alternating sections */
     --color-text: #343a40; /* Darker Gray for better contrast */
     --color-text-light: #6c757d; /* Standard Gray */
     --color-card-bg: #ffffff;
+    --color-card-bg-rgb: 255, 255, 255;
     --color-border: #dee2e6;
     --font-sans-serif: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --color-bg-rgb: 255, 255, 255; /* For navbar */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,12 +22,15 @@
         --color-primary: #a062c4; /* Lighter Purple for dark mode */
         --color-primary-rgb: 160, 98, 196;
         --color-secondary: #b37cd4;
+        --color-secondary-rgb: 179, 124, 212;
         --color-bg: #1a1a1a; /* Darker background */
         --color-bg-alt: #212121; /* Slightly lighter dark */
         --color-text: #e0e0e0;
         --color-text-light: #aaaaaa;
         --color-card-bg: #2c2c2c; /* Dark Card */
+        --color-card-bg-rgb: 44, 44, 44;
         --color-border: #444444;
+        --color-bg-rgb: 26, 26, 26; /* For navbar in dark mode, Corresponds to #1a1a1a */
     }
 }
 
@@ -38,7 +44,7 @@
 }
 
 html {
-    scroll-behavior: smooth; /* Enable smooth scrolling for anchor links */
+    scroll-behavior: smooth;
 }
 
 body {
@@ -47,7 +53,7 @@ body {
     color: var(--color-text);
     line-height: 1.7;
     font-size: 1rem;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -57,19 +63,10 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Navbar Adjustments */
 .navbar {
-    background-color: rgba(var(--color-bg-rgb, 255, 255, 255), 0.85); /* Fallback needed if bg var isn't RGB */
+    background-color: rgba(var(--color-bg-rgb, 255, 255, 255), 0.85);
     backdrop-filter: blur(10px);
     transition: background-color 0.3s ease;
-    /* Add RGB versions of background colors for rgba() */
-    --color-bg-rgb: 255, 255, 255;
 }
-
-@media (prefers-color-scheme: dark) {
-    .navbar {
-        --color-bg-rgb: 26, 26, 26; /* Corresponds to #1a1a1a */
-    }
-}
-
 
 .navbar-brand {
     color: var(--color-primary) !important;
@@ -113,14 +110,12 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Hero Section - Using Gradient Only */
 .hero-section {
-    /* Removed the background image URL */
-    background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.9), rgba(var(--color-secondary-rgb, 108, 52, 131), 0.95)); /* Added fallback RGB for secondary */
-    background-size: cover; /* Keep cover for gradient smoothness */
-    background-position: center center;
-    min-height: 75vh;
+    background-size: cover;
+    background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.9), rgba(var(--color-secondary-rgb, 108, 52, 131), 0.95)) center center;
+    min-height: 90vh;
     color: #ffffff;
-    display: flex; /* Keep flex for alignment */
-    align-items: center; /* Keep vertical alignment */
+    display: flex;
+    align-items: center;
 }
 
 .hero-section .text-light a {
@@ -132,52 +127,129 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: underline;
 }
 
-/* Add RGB for secondary color */
-:root {
-    /* ... existing vars */
-    --color-secondary-rgb: 108, 52, 131;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        /* ... existing dark vars */
-        --color-secondary-rgb: 179, 124, 212; /* Corresponds to #b37cd4 */
-    }
-}
-
-
 .hero-section h1, .hero-section p {
     color: #ffffff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Auth Page Specific Styles */
+.auth-card {
+    background-color: rgba(var(--color-card-bg-rgb), 0.9);
+    padding: 2.5rem 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    .auth-card {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+}
+
+.auth-card h1 {
+    color: var(--color-primary);
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.auth-card .form-label {
+    font-weight: 500;
+    color: var(--color-text-light);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.auth-card .form-control {
+    background-color: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    color: var(--color-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-card .form-control:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--color-primary-rgb), 0.25);
+    background-color: var(--color-card-bg);
+}
+
+.auth-card .form-check-input {
+    border-color: var(--color-border);
+}
+
+.auth-card .form-check-input:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.auth-card .form-check-label {
+    color: var(--color-text-light);
+    font-size: 0.9rem;
+}
+
+/* Submit button within auth-card */
+.auth-card .btn { /* Target general .btn within .auth-card for consistent full-width and margin */
+    width: 100%;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    font-size: 1rem;
+    margin-top: 1.5rem; /* Space above button */
+}
+
+/* .auth-card .btn-primary specific styles are already covered by global .btn-primary and the .auth-card .btn above */
+
+
+.auth-card .auth-links {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.auth-card .auth-links p {
+    color: var(--color-text-light);
+    margin-bottom: 0;
+}
+
+.auth-card .auth-links a {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-card .auth-links a:hover {
+    color: var(--color-secondary);
+    text-decoration: underline;
 }
 
 /* Features Section & Alternating Backgrounds */
 .features-section,
 .testimonials-section {
     background-color: var(--color-bg-alt);
-    padding: 5rem 0; /* Increased padding */
+    padding: 5rem 0;
 }
 
 .section-title {
     font-weight: 700;
-    margin-bottom: 4rem; /* Increased spacing */
+    margin-bottom: 4rem;
     color: var(--color-primary);
     position: relative;
-    padding-bottom: 0.5rem; /* Space for underline */
+    padding-bottom: 0.5rem;
 }
 
-/* Optional: Add a subtle underline effect to titles */
 .section-title::after {
     content: '';
     display: block;
-    width: 60px; /* Width of the underline */
-    height: 3px; /* Thickness */
+    width: 60px;
+    height: 3px;
     background-color: var(--color-primary);
     opacity: 0.6;
     position: absolute;
     bottom: 0;
     left: 50%;
-    transform: translateX(-50%); /* Center the line */
+    transform: translateX(-50%);
     border-radius: 2px;
 }
 
@@ -191,7 +263,7 @@ h1, h2, h3, h4, h5, h6 {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
-    text-align: center; /* Ensure content is centered */
+    text-align: center;
 }
 
 .feature-card:hover {
@@ -210,13 +282,13 @@ h1, h2, h3, h4, h5, h6 {
 .feature-card p {
     color: var(--color-text-light);
     font-size: 0.95rem;
-    margin-top: auto; /* Pushes content down */
-    padding-top: 1rem; /* Add padding above paragraph */
+    margin-top: auto;
+    padding-top: 1rem;
 }
 
 /* How It Works Section */
 .how-it-works-section {
-    padding: 5rem 0; /* Consistent padding */
+    padding: 5rem 0;
 }
 
 .step-icon i {
@@ -224,7 +296,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .step-icon:hover i {
-    transform: scale(1.15) rotate(-5deg); /* Add slight rotation */
+    transform: scale(1.15) rotate(-5deg);
 }
 
 /* Testimonials Section */
@@ -233,26 +305,25 @@ h1, h2, h3, h4, h5, h6 {
     border-left: 5px solid var(--color-primary);
     border-radius: 0.5rem;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    display: flex; /* Use flex for footer alignment */
-    flex-direction: column; /* Stack content */
+    display: flex;
+    flex-direction: column;
 }
 
 .testimonial-card p {
     font-style: italic;
     color: var(--color-text);
-    margin-bottom: 1rem; /* Ensure space before footer */
-    flex-grow: 1; /* Allow paragraph to take available space */
+    margin-bottom: 1rem;
+    flex-grow: 1;
 }
 
 .blockquote-footer {
-    margin-top: auto; /* Keep pushing to bottom */
-    padding-top: 0.5rem; /* Space above footer text */
-    padding-bottom: 0; /* Remove bottom padding if parent card padding is enough */
-    background-color: transparent; /* Ensure no background */
+    margin-top: auto;
+    padding-top: 0.5rem;
+    padding-bottom: 0;
+    background-color: transparent;
     color: var(--color-text-light);
     font-size: 0.9rem;
-    border-top: none; /* Remove the border */
-    /* Remove negative margins and related padding adjustments */
+    border-top: none;
     margin-left: 0;
     margin-right: 0;
     padding-left: 0;
@@ -265,15 +336,15 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Main content spacing */
 main {
-    padding-top: 70px;
+    padding-top: 70px; /* Adjust if your navbar height changes */
     flex-grow: 1;
 }
 
 /* Footer */
 footer {
-    background-color: #212529; /* Slightly darker footer */
+    background-color: #212529;
     color: rgba(255, 255, 255, 0.7);
-    padding: 2rem 0; /* More padding */
+    padding: 2rem 0;
 }
 
 footer small {
@@ -339,5 +410,5 @@ footer a:hover {
 
 .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
-    opacity: 0;
+    opacity: 0; /* Start hidden, animation will make it visible */
 }
