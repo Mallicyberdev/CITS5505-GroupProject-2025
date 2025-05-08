@@ -458,6 +458,17 @@ footer a:hover {
     border-radius: 1rem;
 }
 
+.shared-diary {
+    background-color: #e6f3ff;
+    border-radius: 1rem;
+}
+
+.shared-with-me {
+    background-color: #eaf6ff !important;
+    /* 淡蓝色背景 */
+    border-left: 4px solid #0d6efd;
+}
+
 /* Diary Detail Page */
 
 .diary-content {

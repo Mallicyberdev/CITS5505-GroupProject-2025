@@ -17,5 +17,13 @@ def index():
 @bp.route("/home")
 @login_required
 def home():
-    diaries = DiaryEntry.for_user(current_user.id).order_by().all()
+    diaries = DiaryEntry.query.filter_by(owner_id=current_user.id).order_by(DiaryEntry.created_at.desc()).all()
     return render_template("home.html", diaries=diaries)
+
+@bp.route("/shared")
+@login_required
+def shared():
+    diaries = DiaryEntry.query.filter(
+        DiaryEntry.shared_with.any(id=current_user.id)
+    ).order_by(DiaryEntry.created_at.desc()).all()
+    return render_template("shared.html", diaries=diaries)

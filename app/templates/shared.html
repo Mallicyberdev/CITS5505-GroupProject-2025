@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Main content of the shared diaries page -->
+<div class="container pt-5">
+    <div class="text-center mb-5">
+        <h2>Diaries Shared With You</h2>
+    </div>
+
+    {% if diaries %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for diary in diaries %}
+        <div class="col">
+            <div class="card h-100 diary-card shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ diary.title }}</h5>
+                    <p class="card-text text-muted small">
+                        Owner: {{ diary.owner.username }}
+                        (Shared)
+                    </p>
+                    <p class="card-text flex-grow-1">
+                        {{ diary.content[:150] }}{% if diary.content|length > 150 %}...{% endif %}
+                    </p>
+
+                    {% if diary.analyzed and diary.dominant_emotion_label %}
+                    <p class="card-text mb-2">
+                        <span class="badge rounded-pill
+                                        {% if diary.dominant_emotion_label == 'joy' or diary.dominant_emotion_label == 'love' %} bg-success
+                                        {% elif diary.dominant_emotion_label == 'sadness' or diary.dominant_emotion_label == 'fear' %} bg-info text-dark
+                                        {% elif diary.dominant_emotion_label == 'anger' %} bg-danger
+                                        {% elif diary.dominant_emotion_label == 'surprise' %} bg-warning text-dark
+                                        {% else %} bg-secondary
+                                        {% endif %} emotion-badge">
+                            Emotion: {{ diary.dominant_emotion_label }} ({{ "%.0f"|format(diary.dominant_emotion_score *
+                            100) }}%)
+                        </span>
+                    </p>
+                    {% elif diary.analyzed %}
+                    <p class="card-text mb-2">
+                        <span class="badge rounded-pill bg-light text-dark emotion-badge">Emotion: Not Detected</span>
+                    </p>
+                    {% else %}
+                    <p class="card-text mb-2">
+                        <span class="badge rounded-pill bg-light text-dark emotion-badge">Emotion: Not Analyzed</span>
+                    </p>
+                    {% endif %}
+
+                    <p class="card-text mt-auto">
+                        <small class="text-muted">Created: {{ diary.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    </p>
+
+                    <div class="mt-2">
+                        <a href="{{ url_for('data_handling.view_diary', diary_id=diary.id) }}"
+                            class="btn btn-sm btn-outline-secondary me-1">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center mt-5">
+        <p class="lead">No diaries shared with you yet.</p>
+        <p>When others share with you, their entries will appear here.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Optional: Add any additional scripts here -->
+{% endblock %}
