@@ -1,104 +1,42 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ title }} - Mood Diary</title>
-    <!-- Bootstrap CSS -->
-    <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
-            crossorigin="anonymous"
-    >
-    <!-- Bootstrap Icons (for FAB icon) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.12.1/font/bootstrap-icons.css">
+{% extends "base.html" %}
 
-    <style>
-        body {
-            background-color: #f8f9fa;
-            padding-top: 2rem;
-            padding-bottom: 8rem; /* Extra padding at bottom to avoid FAB covering form controls */
-        }
-
-        .form-control-lg {
-            font-size: 1.1rem;
-        }
-
-        textarea.form-control-lg {
-            min-height: 200px; /* Ensure textarea has a good default height */
-        }
-
-        /* Floating Action Button (FAB) Styles */
-        .fab-container {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            z-index: 1030;
-            display: flex; /* Align buttons horizontally if multiple */
-            gap: 0.75rem; /* Space between FABs if multiple */
-        }
-
-        .fab-btn {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            font-size: 1.3rem; /* Icon size */
-            line-height: 1; /* Center icon vertically */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .fab-btn.btn-success { /* Specific styling for save */
-            /* font-size: 1.5rem; */ /* Make save icon slightly larger if desired */
-        }
-
-    </style>
-</head>
-<body>
-
-<div class="container">
+{% block content %}
+<div class="container pt-5">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
             <div class="text-center mb-4">
                 <h1 class="display-5">{{ title }}</h1>
             </div>
 
-            <form method="POST" action="{{ url_for('data_handling.create_diary') }}">
-                {# Or current page if action is "" #}
-                {{ form.hidden_tag() if form }} {# If using Flask-WTF #}
+            <form method="POST" action="{{ url_for('data_handling.create_diary') }}" id="diaryForm">
+                {{ form.hidden_tag() if form }}
 
                 <div class="mb-4">
                     <label for="diaryTitle" class="form-label fs-5">Title</label>
                     <input type="text" class="form-control form-control-lg" id="diaryTitle" name="title"
-                           placeholder="Enter a captivating title" required
-                           value="{{ request.form.title if request and request.form.title else '' }}">
+                        placeholder="Enter a captivating title" required
+                        value="{{ request.form.title if request and request.form.title else '' }}">
                 </div>
 
                 <div class="mb-3">
                     <label for="diaryContent" class="form-label fs-5">Content</label>
                     <textarea class="form-control form-control-lg" id="diaryContent" name="content" rows="10"
-                              placeholder="Pour your thoughts out here..." required
-                    >{{ request.form.content if request and request.form.content else '' }}</textarea>
+                        placeholder="Pour your thoughts out here..."
+                        required>{{ request.form.content if request and request.form.content else '' }}</textarea>
                 </div>
 
-                {# Example of showing form errors if using Flask-WTF #}
                 {% if form and form.errors %}
-                    <div class="alert alert-danger">
-                        Please correct the errors below:
-                        <ul>
-                            {% for field, errors in form.errors.items() %}
-                                {% for error in errors %}
-                                    <li>{{ form[field].label.text }}: {{ error }}</li>
-                                {% endfor %}
-                            {% endfor %}
-                        </ul>
-                    </div>
+                <div class="alert alert-danger">
+                    Please correct the errors below:
+                    <ul>
+                        {% for field, errors in form.errors.items() %}
+                        {% for error in errors %}
+                        <li>{{ form[field].label.text }}: {{ error }}</li>
+                        {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
                 {% endif %}
-
-                {# Traditional submit button (hidden or removed if only using FAB) #}
-                {# <button type="submit" class="btn btn-primary d-none">Save Diary</button> #}
             </form>
         </div>
     </div>
@@ -113,24 +51,13 @@
         <i class="bi bi-check-lg"></i>
     </button>
 </div>
-{# Note: The submit button above needs its 'form' attribute to point to the form's ID #}
-{# We need to add an ID to the form tag for this to work seamlessly #}
-{# Let's correct the form tag: #}
-{# <form method="POST" action="{{ url_for('diary.create_diary') }}" id="diaryForm"> #}
+{% endblock %}
 
+{% block scripts %}
 <script>
-    // Add ID to the form dynamically if not set, for the FAB submit button
     const formElement = document.querySelector('form');
     if (formElement && !formElement.id) {
-        formElement.id = 'diaryForm'; // Ensure FAB submit button can target this form
+        formElement.id = 'diaryForm';
     }
 </script>
-
-<!-- Bootstrap JS Bundle with Popper -->
-<script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
-        crossorigin="anonymous"
-></script>
-</body>
-</html>
+{% endblock %}
