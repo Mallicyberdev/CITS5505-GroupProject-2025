@@ -1,5 +1,5 @@
 # routes.py
-
+from flask import request
 from flask import render_template, flash, url_for
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
@@ -8,7 +8,7 @@ from app import db
 from app.models import DiaryEntry
 from . import bp
 from .forms import DiaryForm
-
+from app.models import User
 
 @bp.route("/create_diary", methods=["GET", "POST"])
 @login_required
@@ -134,3 +134,37 @@ def delete_diary(diary_id):
         # Log the error e for debugging
 
     return redirect(url_for("main.home"))  # Redirect to home page after deletion
+
+@bp.route("/share_diary/<int:diary_id>", methods=["POST"])
+@login_required
+def share_diary(diary_id):
+    diary_entry = DiaryEntry.query.get_or_404(diary_id)
+
+    if diary_entry.owner_id != current_user.id:
+        flash("You can only share diaries you own.", "danger")
+        return redirect(url_for("main.home"))
+
+    # 改为从 shared_username 获取值
+    shared_username = request.form.get("shared_username")
+    if not shared_username:
+        flash("No username provided.", "warning")
+        return redirect(url_for("data_handling.view_diary", diary_id=diary_id))
+
+    shared_user = User.query.filter_by(username=shared_username).first()
+
+    if not shared_user:
+        flash("User not found.", "warning")
+        return redirect(url_for("data_handling.view_diary", diary_id=diary_id))
+
+    try:
+        success = diary_entry.share_with_user(shared_user)
+        if success:
+            db.session.commit()
+            flash(f"Diary shared with {shared_user.username}.", "success")
+        else:
+            flash(f"Diary already shared or cannot be shared with this user.", "info")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Failed to share diary: {str(e)}", "danger")
+
+    return redirect(url_for("data_handling.view_diary", diary_id=diary_id))
