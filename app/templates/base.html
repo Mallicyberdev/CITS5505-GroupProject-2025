@@ -75,6 +75,24 @@
 
 <main class="flex-fill pt-6">
 
+    {% block content %}{% endblock %}
+
+</main>
+
+<footer class="site-footer mt-auto py-4">
+    <div class="container text-center">
+        <small>
+            © 2025 Mood Diary Analysis • Crafted with
+            <span class="footer-heart">♥</span>
+        </small>
+    </div>
+</footer>
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <script>
@@ -97,26 +115,8 @@
             </script>
         {% endif %}
     {% endwith %}
-
-    {% block content %}{% endblock %}
-
-</main>
-
-<footer class="site-footer mt-auto py-4">
-    <div class="container text-center">
-        <small>
-            © 2025 Mood Diary Analysis • Crafted with
-            <span class="footer-heart">♥</span>
-        </small>
-    </div>
-</footer>
-
-{% block scripts %}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}
+
 </body>
 
 </html>
