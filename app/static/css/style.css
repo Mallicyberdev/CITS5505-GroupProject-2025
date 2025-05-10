@@ -10,11 +10,18 @@
     --color-bg-alt: #f8f9fa; /* Very light gray for alternating sections */
     --color-text: #343a40; /* Darker Gray for better contrast */
     --color-text-light: #6c757d; /* Standard Gray */
+    --color-text-muted: #6c757d;
     --color-card-bg: #ffffff;
     --color-card-bg-rgb: 255, 255, 255;
     --color-border: #dee2e6;
-    --font-sans-serif: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --color-bg-rgb: 255, 255, 255; /* For navbar */
+    --font-sans-serif: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --border-radius-sm: 0.25rem;
+    --border-radius-md: 0.375rem;
+    --border-radius-pill: 50rem;
+    --navbar-height: 60px;
+    --navbar-padding-y: 0.75rem;
+    --navbar-padding-x: 1rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -48,7 +55,7 @@ html {
 }
 
 body {
-    font-family: var(--font-sans-serif);
+    font-family: var(--font-sans-serif), serif;
     background-color: var(--color-bg);
     color: var(--color-text);
     line-height: 1.7;
@@ -62,27 +69,125 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Navbar Adjustments */
+
 .navbar {
-    background-color: rgba(var(--color-bg-rgb, 255, 255, 255), 0.85);
+    background-color: rgba(var(--color-bg-rgb), 0.75);
     backdrop-filter: blur(10px);
-    transition: background-color 0.3s ease;
+    -webkit-backdrop-filter: blur(10px); /* Safari */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    padding-top: var(--navbar-padding-y);
+    padding-bottom: var(--navbar-padding-y);
+    min-height: var(--navbar-height);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
 
+/* Navbar Brand (Logo/Site Name) */
 .navbar-brand {
     color: var(--color-primary) !important;
     font-weight: 700;
+    font-size: 1.5rem;
+    transition: color 0.2s ease-in-out;
 }
 
-.nav-link {
-    color: var(--color-primary) !important;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    margin: 0 0.5rem;
-}
-
-.nav-link:hover,
 .navbar-brand:hover {
     color: var(--color-secondary) !important;
+}
+
+/* Navbar Toggler */
+.navbar-toggler {
+    border: none;
+    padding: 0.25rem 0.5rem;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+}
+
+
+/* Nav Links */
+.nav-link {
+    color: var(--color-text) !important;
+    font-weight: 500;
+    margin: 0.25rem 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-md);
+    position: relative;
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+    color: var(--color-primary) !important;
+    background-color: rgba(var(--color-primary-rgb), 0.08);
+}
+
+/* Active Nav Link Style */
+.nav-link.active {
+    color: var(--color-primary) !important;
+    font-weight: 600;
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+}
+
+/* Underline for active link */
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 1rem;
+    right: 1rem;
+    height: 2px;
+    background-color: var(--color-primary);
+    border-radius: 1px;
+}
+
+/* "Hi, User" Text */
+.nav-link.disabled {
+    color: var(--color-text-muted) !important;
+    background-color: transparent !important;
+}
+
+.nav-link.disabled:hover {
+    color: var(--color-text-muted) !important;
+}
+
+
+/* Sign Up Button Specific Styling */
+.nav-item .nav-btn-signup {
+    color: #fff !important;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--border-radius-pill);
+    font-weight: 500;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, transform 0.1s ease;
+}
+
+.nav-item .nav-btn-signup:hover {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.2);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 991.98px) {
+    .nav-item .nav-btn-signup {
+        margin-top: 0.75rem !important;
+        width: 100%;
+        text-align: center;
+    }
+
+    .navbar-nav {
+        padding-top: 0.5rem;
+    }
+
+    .nav-link {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .nav-link.active::after {
+        display: none;
+    }
 }
 
 /* Button Overrides */
@@ -201,8 +306,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* .auth-card .btn-primary specific styles are already covered by global .btn-primary and the .auth-card .btn above */
-
-
 .auth-card .auth-links {
     text-align: center;
     margin-top: 1.5rem;
@@ -341,25 +444,26 @@ main {
 }
 
 /* Footer */
-footer {
-    background-color: #212529;
-    color: rgba(255, 255, 255, 0.7);
-    padding: 2rem 0;
+.site-footer {
+    background-color: var(--color-bg); /* Uses the same base background as the page, adapts to light/dark */
+    color: var(--color-text-muted); /* Muted text color, adapts to light/dark */
+    border-top: 1px solid var(--color-border); /* A subtle top border for separation */
+    /* py-4 from Bootstrap (padding-top: 1.5rem; padding-bottom: 1.5rem;) is kept.
+       If you want to control padding via CSS variables, you can add:
+       padding-top: var(--footer-padding-y, 1.5rem);
+       padding-bottom: var(--footer-padding-y, 1.5rem);
+       And define --footer-padding-y in :root if needed.
+    */
 }
 
-footer small {
-    font-size: 0.9rem;
+.site-footer small {
+    font-size: 0.9em; /* Slightly adjust the size of the small text if needed */
+    /* Default for <small> is usually 0.875em of parent */
 }
 
-footer a {
-    color: var(--color-primary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-footer a:hover {
-    text-decoration: underline;
-    color: var(--color-secondary);
+.site-footer .footer-heart {
+    color: var(--color-primary); /* Use the primary theme color for the heart */
+    font-style: normal; /* Ensure heart isn't italicized if small tag has it */
 }
 
 /* Utility: Background for alternating sections */
@@ -415,28 +519,8 @@ footer a:hover {
 
 
 /* Home Page */
-.bottom-center-add-btn {
-    position: fixed;
-    bottom: 90px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    width: 64px;
-    height: 64px;
-    font-size: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1030;
-}
-
 .diary-card {
-    background-color: #f3e9fe;
-    border-radius: 1rem;
-}
-
-.shared-diary {
-    background-color: #e6f3ff;
+    background-color: var(--color-card-bg);
     border-radius: 1rem;
 }
 
@@ -446,7 +530,6 @@ footer a:hover {
 }
 
 /* Diary Detail Page */
-
 .diary-content {
     white-space: pre-wrap;
     font-size: 1rem;
@@ -491,9 +574,17 @@ footer a:hover {
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    transition: box-shadow 0.2s ease;
+    transition: transform .2s ease, box-shadow .2s ease;
+    z-index: 1030;
+}
+
+.fab-btn-lg {
+    width: 70px;
+    height: 70px;
+    font-size: 2rem;
 }
 
 .fab-btn:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: var(--bs-box-shadow-lg);
 }
