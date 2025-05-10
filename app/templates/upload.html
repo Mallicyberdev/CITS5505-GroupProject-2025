@@ -1,63 +1,63 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container pt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-            <div class="text-center mb-4">
-                <h1 class="display-5">{{ title }}</h1>
+    <div class="container pt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="text-center mb-4">
+                    <h1 class="display-5">{{ title }}</h1>
+                </div>
+
+                <form method="POST" action="{{ url_for('data_handling.create_diary') }}" id="diaryForm">
+                    {{ form.hidden_tag() if form }}
+
+                    <div class="mb-4">
+                        <label for="diaryTitle" class="form-label fs-5">Title</label>
+                        <input type="text" class="form-control form-control-lg" id="diaryTitle" name="title"
+                               placeholder="Enter a captivating title" required
+                               value="{{ request.form.title if request and request.form.title else '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="diaryContent" class="form-label fs-5">Content</label>
+                        <textarea class="form-control form-control-lg" id="diaryContent" name="content" rows="10"
+                                  placeholder="Pour your thoughts out here..."
+                                  required>{{ request.form.content if request and request.form.content else '' }}</textarea>
+                    </div>
+
+                    {% if form and form.errors %}
+                        <div class="alert alert-danger">
+                            Please correct the errors below:
+                            <ul>
+                                {% for field, errors in form.errors.items() %}
+                                    {% for error in errors %}
+                                        <li>{{ form[field].label.text }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </form>
             </div>
-
-            <form method="POST" action="{{ url_for('data_handling.create_diary') }}" id="diaryForm">
-                {{ form.hidden_tag() if form }}
-
-                <div class="mb-4">
-                    <label for="diaryTitle" class="form-label fs-5">Title</label>
-                    <input type="text" class="form-control form-control-lg" id="diaryTitle" name="title"
-                        placeholder="Enter a captivating title" required
-                        value="{{ request.form.title if request and request.form.title else '' }}">
-                </div>
-
-                <div class="mb-3">
-                    <label for="diaryContent" class="form-label fs-5">Content</label>
-                    <textarea class="form-control form-control-lg" id="diaryContent" name="content" rows="10"
-                        placeholder="Pour your thoughts out here..."
-                        required>{{ request.form.content if request and request.form.content else '' }}</textarea>
-                </div>
-
-                {% if form and form.errors %}
-                <div class="alert alert-danger">
-                    Please correct the errors below:
-                    <ul>
-                        {% for field, errors in form.errors.items() %}
-                        {% for error in errors %}
-                        <li>{{ form[field].label.text }}: {{ error }}</li>
-                        {% endfor %}
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-            </form>
         </div>
     </div>
-</div>
 
-<!-- Floating Action Buttons -->
-<div class="fab-container">
-    <a href="{{ url_for('main.home') }}" class="btn btn-secondary shadow fab-btn" title="Cancel and Go Home">
-        <i class="bi bi-x-lg"></i>
-    </a>
-    <button type="submit" form="diaryForm" class="btn btn-success shadow fab-btn" title="Save Diary">
-        <i class="bi bi-check-lg"></i>
-    </button>
-</div>
+    <!-- Floating Action Buttons -->
+    <div class="fab-container">
+        <a href="{{ url_for('main.home') }}" class="btn btn-secondary shadow fab-btn" title="Cancel and Go Home">
+            <i class="bi bi-x-lg"></i>
+        </a>
+        <button type="submit" form="diaryForm" class="btn btn-success shadow fab-btn" title="Save Diary">
+            <i class="bi bi-check-lg"></i>
+        </button>
+    </div>
 {% endblock %}
 
 {% block scripts %}
-<script>
-    const formElement = document.querySelector('form');
-    if (formElement && !formElement.id) {
-        formElement.id = 'diaryForm';
-    }
-</script>
+    <script>
+        const formElement = document.querySelector('form');
+        if (formElement && !formElement.id) {
+            formElement.id = 'diaryForm';
+        }
+    </script>
 {% endblock %}

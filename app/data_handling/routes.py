@@ -1,14 +1,13 @@
 # routes.py
-from flask import request
-from flask import render_template, flash, url_for
+from flask import request, render_template, flash, url_for
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
 
 from app import db
-from app.models import DiaryEntry
+from app.models import User, DiaryEntry
 from . import bp
 from .forms import DiaryForm
-from app.models import User
+
 
 @bp.route("/create_diary", methods=["GET", "POST"])
 @login_required
@@ -135,6 +134,7 @@ def delete_diary(diary_id):
 
     return redirect(url_for("main.home"))  # Redirect to home page after deletion
 
+
 @bp.route("/share_diary/<int:diary_id>", methods=["POST"])
 @login_required
 def share_diary(diary_id):
@@ -144,7 +144,6 @@ def share_diary(diary_id):
         flash("You can only share diaries you own.", "danger")
         return redirect(url_for("main.home"))
 
-    # 改为从 shared_username 获取值
     shared_username = request.form.get("shared_username")
     if not shared_username:
         flash("No username provided.", "warning")

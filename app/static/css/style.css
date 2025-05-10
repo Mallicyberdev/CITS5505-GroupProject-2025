@@ -2,47 +2,35 @@
 
 /* Color Palette & Dark Mode */
 :root {
-    --color-primary: #8e44ad;
-    /* Purple */
+    --color-primary: #8e44ad; /* Purple */
     --color-primary-rgb: 142, 68, 173;
-    --color-secondary: #6c3483;
-    /* Darker Purple */
+    --color-secondary: #6c3483; /* Darker Purple */
     --color-secondary-rgb: 108, 52, 131;
-    --color-bg: #ffffff;
-    /* Lighter background */
-    --color-bg-alt: #f8f9fa;
-    /* Very light gray for alternating sections */
-    --color-text: #343a40;
-    /* Darker Gray for better contrast */
-    --color-text-light: #6c757d;
-    /* Standard Gray */
+    --color-bg: #ffffff; /* Lighter background */
+    --color-bg-alt: #f8f9fa; /* Very light gray for alternating sections */
+    --color-text: #343a40; /* Darker Gray for better contrast */
+    --color-text-light: #6c757d; /* Standard Gray */
     --color-card-bg: #ffffff;
     --color-card-bg-rgb: 255, 255, 255;
     --color-border: #dee2e6;
     --font-sans-serif: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --color-bg-rgb: 255, 255, 255;
-    /* For navbar */
+    --color-bg-rgb: 255, 255, 255; /* For navbar */
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --color-primary: #a062c4;
-        /* Lighter Purple for dark mode */
+        --color-primary: #a062c4; /* Lighter Purple for dark mode */
         --color-primary-rgb: 160, 98, 196;
         --color-secondary: #b37cd4;
         --color-secondary-rgb: 179, 124, 212;
-        --color-bg: #1a1a1a;
-        /* Darker background */
-        --color-bg-alt: #212121;
-        /* Slightly lighter dark */
+        --color-bg: #1a1a1a; /* Darker background */
+        --color-bg-alt: #212121; /* Slightly lighter dark */
         --color-text: #e0e0e0;
         --color-text-light: #aaaaaa;
-        --color-card-bg: #2c2c2c;
-        /* Dark Card */
+        --color-card-bg: #2c2c2c; /* Dark Card */
         --color-card-bg-rgb: 44, 44, 44;
         --color-border: #444444;
-        --color-bg-rgb: 26, 26, 26;
-        /* For navbar in dark mode, Corresponds to #1a1a1a */
+        --color-bg-rgb: 26, 26, 26; /* For navbar in dark mode, Corresponds to #1a1a1a */
     }
 }
 
@@ -68,12 +56,7 @@ body {
     overflow-x: hidden;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
     color: var(--color-text);
     font-weight: 600;
 }
@@ -144,8 +127,7 @@ h6 {
     text-decoration: underline;
 }
 
-.hero-section h1,
-.hero-section p {
+.hero-section h1, .hero-section p {
     color: #ffffff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -210,14 +192,12 @@ h6 {
 }
 
 /* Submit button within auth-card */
-.auth-card .btn {
-    /* Target general .btn within .auth-card for consistent full-width and margin */
+.auth-card .btn { /* Target general .btn within .auth-card for consistent full-width and margin */
     width: 100%;
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
     font-size: 1rem;
-    margin-top: 1.5rem;
-    /* Space above button */
+    margin-top: 1.5rem; /* Space above button */
 }
 
 /* .auth-card .btn-primary specific styles are already covered by global .btn-primary and the .auth-card .btn above */
@@ -356,8 +336,7 @@ h6 {
 
 /* Main content spacing */
 main {
-    padding-top: 70px;
-    /* Adjust if your navbar height changes */
+    padding-top: 70px; /* Adjust if your navbar height changes */
     flex-grow: 1;
 }
 
@@ -423,7 +402,6 @@ footer a:hover {
         opacity: 0;
         transform: translateY(20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -432,8 +410,7 @@ footer a:hover {
 
 .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
-    opacity: 0;
-    /* Start hidden, animation will make it visible */
+    opacity: 0; /* Start hidden, animation will make it visible */
 }
 
 
@@ -464,8 +441,7 @@ footer a:hover {
 }
 
 .shared-with-me {
-    background-color: #eaf6ff !important;
-    /* 淡蓝色背景 */
+    background-color: #eaf6ff !important; /* Light blue */
     border-left: 4px solid #0d6efd;
 }
 
