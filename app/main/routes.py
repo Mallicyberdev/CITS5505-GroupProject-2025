@@ -1,7 +1,6 @@
 # app/main/routes.py
 from flask import render_template
 from flask_login import login_required, current_user
-from sqlalchemy import or_
 
 from . import bp
 from app.models import DiaryEntry
@@ -33,4 +32,4 @@ def shared():
         .order_by(DiaryEntry.created_at.desc())
         .all()
     )
-    return render_template("shared.html", diaries=diaries)
+    return render_template("dashboard/shared.html", diaries=diaries)
