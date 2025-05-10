@@ -84,12 +84,15 @@ def edit_diary(diary_id):
             flash(f"Error updating diary entry: {str(e)}", "danger")
             # Log the error e for debugging
 
+    prev_url = request.referrer or url_for("main.home", diary_id=diary_entry.id)
+    print(prev_url)
     # For GET request, or if form validation failed on POST, render the edit form
     return render_template(
         "edit.html",
         title="Edit Diary Entry",
         form=form,
         diary_entry=diary_entry,
+        prev_url=prev_url,
     )
 
 
