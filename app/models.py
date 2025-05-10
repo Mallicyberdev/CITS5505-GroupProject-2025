@@ -32,6 +32,13 @@ class User(UserMixin, db.Model):
         lazy="dynamic",
     )
 
+    def __init__(self, username=None, email=None, **kwargs):
+        super().__init__(**kwargs)
+        if username:
+            self.username = username
+        if email:
+            self.email = email
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
