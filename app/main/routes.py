@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from sqlalchemy import or_
 
 from . import bp
-from ..models import DiaryEntry
+from app.models import DiaryEntry
 
 
 @bp.route("/")
@@ -17,13 +17,20 @@ def index():
 @bp.route("/home")
 @login_required
 def home():
-    diaries = DiaryEntry.query.filter_by(owner_id=current_user.id).order_by(DiaryEntry.created_at.desc()).all()
+    diaries = (
+        DiaryEntry.query.filter_by(owner_id=current_user.id)
+        .order_by(DiaryEntry.created_at.desc())
+        .all()
+    )
     return render_template("home.html", diaries=diaries)
+
 
 @bp.route("/shared")
 @login_required
 def shared():
-    diaries = DiaryEntry.query.filter(
-        DiaryEntry.shared_with.any(id=current_user.id)
-    ).order_by(DiaryEntry.created_at.desc()).all()
+    diaries = (
+        DiaryEntry.query.filter(DiaryEntry.shared_with.any(id=current_user.id))
+        .order_by(DiaryEntry.created_at.desc())
+        .all()
+    )
     return render_template("shared.html", diaries=diaries)

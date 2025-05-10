@@ -2,30 +2,30 @@
 
 
 {% block content %}
-<!-- Main content of the home page -->
-<!-- Main Content -->
-<div class="container">
-    <div class="text-center mb-5">
-    </div>
+    <!-- Main content of the home page -->
+    <!-- Main Content -->
+    <div class="container">
+        <div class="text-center mb-5">
+        </div>
 
-    {% if diaries %}
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {% for diary in diaries %}
-        <div class="col">
-            <div class="card h-100 diary-card shadow-sm {% if diary.get_shared_users() %}shared-diary{% endif %}">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ diary.title }}</h5>
-                    <p class="card-text text-muted small">
-                        Owner: {{ diary.owner.username }}
-                        {% if diary.owner_id != current_user.id %}
-                        (Shared)
-                        {% endif %}
-                    </p>
-                    <p class="card-text flex-grow-1">
-                        {{ diary.content[:150] }}{% if diary.content|length > 150 %}...{% endif %}</p>
+        {% if diaries %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for diary in diaries %}
+                    <div class="col">
+                        <div class="card h-100 diary-card shadow-sm {% if diary.get_shared_users() %}shared-diary{% endif %}">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ diary.title }}</h5>
+                                <p class="card-text text-muted small">
+                                    Owner: {{ diary.owner.username }}
+                                    {% if diary.owner_id != current_user.id %}
+                                        (Shared)
+                                    {% endif %}
+                                </p>
+                                <p class="card-text flex-grow-1">
+                                    {{ diary.content[:150] }}{% if diary.content|length > 150 %}...{% endif %}</p>
 
-                    {% if diary.analyzed and diary.dominant_emotion_label %}
-                    <p class="card-text mb-2">
+                                {% if diary.analyzed and diary.dominant_emotion_label %}
+                                    <p class="card-text mb-2">
                         <span class="badge rounded-pill
                                     {% if diary.dominant_emotion_label == 'joy' or diary.dominant_emotion_label == 'love' %} bg-success
                                     {% elif diary.dominant_emotion_label == 'sadness' or diary.dominant_emotion_label == 'fear' %} bg-info text-dark
@@ -36,56 +36,58 @@
                             Emotion: {{ diary.dominant_emotion_label }} ({{ "%.0f"|format(diary.dominant_emotion_score *
                             100) }}%)
                         </span>
-                    </p>
-                    {% elif diary.analyzed %}
-                    <p class="card-text mb-2"><span class="badge rounded-pill bg-light text-dark emotion-badge">Emotion:
+                                    </p>
+                                {% elif diary.analyzed %}
+                                    <p class="card-text mb-2"><span
+                                            class="badge rounded-pill bg-light text-dark emotion-badge">Emotion:
                             Not Detected</span>
-                    </p>
-                    {% else %}
-                    <p class="card-text mb-2"><span class="badge rounded-pill bg-light text-dark emotion-badge">Emotion:
+                                    </p>
+                                {% else %}
+                                    <p class="card-text mb-2"><span
+                                            class="badge rounded-pill bg-light text-dark emotion-badge">Emotion:
                             Not Analyzed</span>
-                    </p>
-                    {% endif %}
+                                    </p>
+                                {% endif %}
 
-                    <p class="card-text mt-auto"><small class="text-muted">Created: {{
-                            diary.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                    </p>
+                                <p class="card-text mt-auto"><small
+                                        class="text-muted">Created: {{ diary.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </p>
 
-                    <div class="mt-2">
-                        <a href="{{ url_for('data_handling.view_diary', diary_id=diary.id) }}"
-                            class="btn btn-sm btn-outline-secondary me-1">View Details</a>
-                        {% if diary.owner_id == current_user.id %}
-                        <a href="{{ url_for('data_handling.edit_diary', diary_id=diary.id) }}"
-                            class="btn btn-sm btn-primary">Edit</a>
-                        {% endif %}
+                                <div class="mt-2">
+                                    <a href="{{ url_for('data_handling.view_diary', diary_id=diary.id) }}"
+                                       class="btn btn-sm btn-outline-secondary me-1">View Details</a>
+                                    {% if diary.owner_id == current_user.id %}
+                                        <a href="{{ url_for('data_handling.edit_diary', diary_id=diary.id) }}"
+                                           class="btn btn-sm btn-primary">Edit</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             </div>
-        </div>
-        {% endfor %}
+        {% else %}
+            <div class="text-center mt-5">
+                <p class="lead">No diaries found yet.</p>
+                <p>Why not start by creating your first one?</p>
+                <a href="{{ url_for('data_handling.create_diary') }}" class="btn btn-lg btn-success">
+                    <i class="bi bi-journal-plus"></i> Create New Diary
+                </a>
+            </div>
+        {% endif %}
     </div>
-    {% else %}
-    <div class="text-center mt-5">
-        <p class="lead">No diaries found yet.</p>
-        <p>Why not start by creating your first one?</p>
-        <a href="{{ url_for('data_handling.create_diary') }}" class="btn btn-lg btn-success">
-            <i class="bi bi-journal-plus"></i> Create New Diary
-        </a>
-    </div>
-    {% endif %}
-</div>
 
-{% if current_user.is_authenticated %}
-<a href="{{ url_for('data_handling.create_diary') }}" class="btn btn-success shadow-lg bottom-center-add-btn"
-    title="Create New Diary">
-    <i class="bi bi-plus-lg"></i>
-</a>
-{% endif %}
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('data_handling.create_diary') }}" class="btn btn-success shadow-lg bottom-center-add-btn"
+           title="Create New Diary">
+            <i class="bi bi-plus-lg"></i>
+        </a>
+    {% endif %}
 
 
 
 {% endblock %}
 
 {% block scripts %}
-<!-- Optional: Add any additional scripts here -->
+    <!-- Optional: Add any additional scripts here -->
 {% endblock %}
