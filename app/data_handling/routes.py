@@ -25,7 +25,9 @@ def create_diary():
         return redirect(url_for("main.home"))  # Or your main diary list page
 
     # For GET request, or if form validation fails on POST
-    return render_template("upload.html", title="Create Diary Entry", form=form)
+    return render_template(
+        "dashboard/upload.html", title="Create Diary Entry", form=form
+    )
 
 
 @bp.route("/view_diary/<diary_id>")
@@ -39,7 +41,7 @@ def view_diary(diary_id):
         return redirect(url_for("main.home"))
 
     return render_template(
-        "details.html", title="View Diary Entry", diary_entry=diary_entry
+        "dashboard/details.html", title="View Diary Entry", diary_entry=diary_entry
     )
 
 
@@ -88,7 +90,7 @@ def edit_diary(diary_id):
     print(prev_url)
     # For GET request, or if form validation failed on POST, render the edit form
     return render_template(
-        "edit.html",
+        "dashboard/edit.html",
         title="Edit Diary Entry",
         form=form,
         diary_entry=diary_entry,
