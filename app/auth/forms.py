@@ -30,12 +30,14 @@ class RegistrationForm(FlaskForm):
     )
     submit = SubmitField("Register")
 
-    def validate_username(self, username):
+    @classmethod
+    def validate_username(cls, username):
         user = db.session.scalar(select(User).filter_by(username=username.data))
         if user is not None:
             raise ValidationError("Please use a different username.")
 
-    def validate_email(self, email):
+    @classmethod
+    def validate_email(cls, email):
         user = db.session.scalar(select(User).filter_by(email=email.data))
         if user is not None:
             raise ValidationError("Please use a different email address.")
