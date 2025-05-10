@@ -13,10 +13,19 @@
                 Gain clarity on your emotional landscape. Understand your triggers, celebrate your joys, and build a
                 more mindful existence with Mood Diary Analysis.
             </p>
-            <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg animate-fade-in-up"
-               style="animation-delay: 0.4s;">
-                Start Your Free Journey
-            </a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.home') }}"
+                   class="btn btn-light btn-lg animate-fade-in-up"
+                   style="animation-delay: 0.4s;">
+                    Start Your Free Journey
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.register') }}"
+                   class="btn btn-light btn-lg animate-fade-in-up"
+                   style="animation-delay: 0.4s;">
+                    Start Your Free Journey
+                </a>
+            {% endif %}
         </div>
     </section>
 
