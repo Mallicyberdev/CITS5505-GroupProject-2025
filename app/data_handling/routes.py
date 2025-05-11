@@ -8,6 +8,14 @@ from app.models import User, DiaryEntry
 from . import bp
 from .forms import DiaryForm
 
+from transformers import pipeline
+
+emotion_classifier = pipeline(
+    "text-classification",
+    model="j-hartmann/emotion-english-distilroberta-base",
+    top_k=None,
+)
+
 
 @bp.route("/create_diary", methods=["GET", "POST"])
 @login_required
@@ -19,9 +27,14 @@ def create_diary():
             content=form.content.data,
             owner_id=current_user.id,
         )
+        result = emotion_classifier(new_diary.content)
+
+        new_diary.update_emotion_analysis(result)
+
         db.session.add(new_diary)
         db.session.commit()
-        flash("Diary entry created successfully!", "success")
+
+        flash("Diary created and analyzed successfully!", "success")
         return redirect(url_for("main.home"))  # Or your main diary list page
 
     # For GET request, or if form validation fails on POST
@@ -64,15 +77,12 @@ def edit_diary(diary_id):
     if form.validate_on_submit():  # This handles POST request and validation
         # Update the diary_entry object with form data
         diary_entry.title = form.title.data
-        diary_entry.content = form.content.data
 
-        # Optional: Mark for re-analysis if content changed.
-        # You might want a more sophisticated check if the content actually changed.
-        # For simplicity, we can just mark it as not analyzed.
-        diary_entry.analyzed = False
-        diary_entry.dominant_emotion_label = None
-        diary_entry.dominant_emotion_score = None
-        diary_entry.emotion_details_json = None
+        # Perform emotion analysis on the updated content
+        if form.content.data != diary_entry.content:
+            diary_entry.content = form.content.data
+            result = emotion_classifier(diary_entry.content)
+            diary_entry.update_emotion_analysis(result)
 
         try:
             db.session.commit()
