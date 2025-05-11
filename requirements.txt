@@ -10,3 +10,5 @@ python-magic>=0.4.27  # For file type detection
 Flask-Migrate>=4.1.0 # For database migrations
 WTForms~=3.2.1
 alembic~=1.15.2
+transformers>=4.51.3
+torch>=2.7.0

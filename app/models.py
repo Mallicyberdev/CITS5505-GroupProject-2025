@@ -109,10 +109,9 @@ class DiaryEntry(db.Model):
             self.dominant_emotion_score = None
             self.emotion_details_json = None
             self.analyzed = True  # Mark as analyzed, even if result was empty/invalid
-            return
+            return False
 
-        # --- IMPORTANT: Handle the nested list structure ---
-        # Your input is [[{...}, {...}]], we need the inner list [{...}, {...}]
+        # Our input is [[{...}, {...}]], we need the inner list [{...}, {...}]
         emotion_scores = analysis_result[0]  # Get the actual list of scores
 
         if not emotion_scores:
@@ -121,7 +120,7 @@ class DiaryEntry(db.Model):
             self.dominant_emotion_score = None
             self.emotion_details_json = None
             self.analyzed = True
-            return
+            return False
 
         # Find dominant emotion
         dominant_emotion = max(emotion_scores, key=lambda item: item["score"])
@@ -131,6 +130,8 @@ class DiaryEntry(db.Model):
         self.dominant_emotion_score = dominant_emotion["score"]
         self.emotion_details_json = emotion_scores  # Store the list of dicts
         self.analyzed = True
+
+        return True
 
     @classmethod
     def for_user(cls, user_id):
