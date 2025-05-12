@@ -1,0 +1,107 @@
+/* Auth Page Specific Styles */
+.auth-card {
+    background-color: rgba(var(--color-card-bg-rgb), 0.9);
+    padding: 2.5rem 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    .auth-card {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+}
+
+.auth-card h1 {
+    color: var(--color-primary);
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.auth-card .form-label {
+    font-weight: 500;
+    color: var(--color-text-light);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.auth-card .form-control {
+    background-color: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    color: var(--color-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-card .form-control:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--color-primary-rgb), 0.25);
+    background-color: var(--color-card-bg);
+}
+
+.auth-card .form-check-input {
+    border-color: var(--color-border);
+}
+
+.auth-card .form-check-input:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.auth-card .form-check-label {
+    color: var(--color-text-light);
+    font-size: 0.9rem;
+}
+
+/* Submit button within auth-card */
+.auth-card .btn { /* Target general .btn within .auth-card for consistent full-width and margin */
+    width: 100%;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    font-size: 1rem;
+    margin-top: 1.5rem; /* Space above button */
+}
+
+/* .auth-card .btn-primary specific styles are already covered by global .btn-primary and the .auth-card .btn above */
+.auth-card .auth-links {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.auth-card .auth-links p {
+    color: var(--color-text-light);
+    margin-bottom: 0;
+}
+
+.auth-card .auth-links a {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-card .auth-links a:hover {
+    color: var(--color-secondary);
+    text-decoration: underline;
+}
+
+/* Sign Up Button Specific Styling */
+.nav-item .nav-btn-signup {
+    color: #fff !important;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--border-radius-pill);
+    font-weight: 500;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, transform 0.1s ease;
+}
+
+.nav-item .nav-btn-signup:hover {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.2);
+}

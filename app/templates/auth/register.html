@@ -3,6 +3,10 @@
 
 {% block title %}Sign Up - Mood Diary Analysis{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
 {% block content %}
     <div class="hero-section">
         <div class="container py-4 py-md-5">

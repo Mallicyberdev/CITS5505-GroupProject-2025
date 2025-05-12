@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/diary.css') }}">
+{% endblock %}
+
 {% block content %}
-    <!-- Main content of the shared diaries page -->
     <div class="container pt-5">
         <div class="text-center mb-5">
             <h2>Diaries Shared With You</h2>
