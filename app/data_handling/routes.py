@@ -1,5 +1,5 @@
 # routes.py
-from flask import request, render_template, flash, url_for
+from flask import request, render_template, flash, url_for, jsonify
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
 
@@ -101,7 +101,6 @@ def edit_diary(diary_id):
             # Log the error e for debugging
 
     prev_url = request.referrer or url_for("main.home", diary_id=diary_entry.id)
-    print(prev_url)
     # For GET request, or if form validation failed on POST, render the edit form
     return render_template(
         "dashboard/edit.html",
@@ -112,9 +111,7 @@ def edit_diary(diary_id):
     )
 
 
-@bp.route(
-    "/delete_diary/<int:diary_id>", methods=["POST"]
-)  # Strictly POST for deletion
+@bp.route("/delete_diary/<int:diary_id>", methods=["POST"])
 @login_required
 def delete_diary(diary_id):
     diary_entry = db.session.get(DiaryEntry, diary_id)
@@ -124,34 +121,17 @@ def delete_diary(diary_id):
 
     if diary_entry.owner_id != current_user.id:
         flash("You do not have permission to delete this diary entry.", "danger")
-        # It might be better to redirect to the diary's view page if they somehow got here
         return redirect(url_for("data_handling.view_diary", diary_id=diary_id))
 
-    # CSRF Protection: Flask-WTF handles CSRF if you're using a form for deletion
-    # If you are not using a FlaskForm for the delete button in details.html,
-    # you should implement CSRF protection manually or use a library like Flask-SeaSurf.
-    # For simplicity, this example assumes the POST request is legitimate.
-    # A common way is to create a simple DeleteForm(FlaskForm) with only a submit button
-    # and validate it here, or check request.form.get('csrf_token').
-
     try:
-        # Before deleting the diary, remove its shares if any.
-        # SQLAlchemy should handle this automatically if the `diary_shares` table
-        # has ON DELETE CASCADE for the `diary_id` foreign key,
-        # or if the relationship is configured correctly.
-        # If not, you might need to manually clear `diary_entry.shared_with`:
-        # diary_entry.shared_with = []
-        # db.session.commit() # Commit this change before deleting the diary object
-
         db.session.delete(diary_entry)
         db.session.commit()
         flash("Diary entry deleted successfully.", "success")
     except Exception as e:
         db.session.rollback()
         flash(f"Error deleting diary entry: {str(e)}", "danger")
-        # Log the error e for debugging
 
-    return redirect(url_for("main.home"))  # Redirect to home page after deletion
+    return redirect(url_for("main.home"))
 
 
 @bp.route("/share_diary/<int:diary_id>", methods=["POST"])
@@ -163,26 +143,53 @@ def share_diary(diary_id):
         flash("You can only share diaries you own.", "danger")
         return redirect(url_for("main.home"))
 
-    shared_username = request.form.get("shared_username")
-    if not shared_username:
-        flash("No username provided.", "warning")
-        return redirect(url_for("data_handling.view_diary", diary_id=diary_id))
-
-    shared_user = User.query.filter_by(username=shared_username).first()
-
-    if not shared_user:
-        flash("User not found.", "warning")
-        return redirect(url_for("data_handling.view_diary", diary_id=diary_id))
+    shared_usernames = request.form.getlist("shared_users")
+    current_shared_users = {user.username for user in diary_entry.get_shared_users()}
 
     try:
-        success = diary_entry.share_with_user(shared_user)
-        if success:
+        success_count = 0
+        # Share with newly selected users
+        for username in shared_usernames:
+            if username not in current_shared_users:
+                shared_user = User.query.filter_by(username=username).first()
+                if not shared_user:
+                    flash(f"User '{username}' not found.", "warning")
+                    continue
+                if diary_entry.share_with_user(shared_user):
+                    success_count += 1
+
+        # Unshare from users who were deselected
+        for username in current_shared_users:
+            if username not in shared_usernames:
+                shared_user = User.query.filter_by(username=username).first()
+                if shared_user and diary_entry.unshare_from_user(shared_user):
+                    success_count += 1
+
+        if success_count > 0:
             db.session.commit()
-            flash(f"Diary shared with {shared_user.username}.", "success")
+            flash(f"Diary sharing updated (changes applied to {success_count} user(s)).", "success")
         else:
-            flash(f"Diary already shared or cannot be shared with this user.", "info")
+            flash("No changes made to sharing settings.", "info")
     except Exception as e:
         db.session.rollback()
-        flash(f"Failed to share diary: {str(e)}", "danger")
+        flash(f"Failed to update diary sharing: {str(e)}", "danger")
 
     return redirect(url_for("data_handling.view_diary", diary_id=diary_id))
+
+
+@bp.route("/list_users", methods=["GET"])
+@login_required
+def list_users():
+    users = User.query.all()
+    return jsonify([{"id": user.id, "username": user.username} for user in users])
+
+
+@bp.route("/get_shared_users/<int:diary_id>", methods=["GET"])
+@login_required
+def get_shared_users(diary_id):
+    diary_entry = DiaryEntry.query.get_or_404(diary_id)
+    if diary_entry.owner_id != current_user.id:
+        flash("You can only view shared users for diaries you own.", "danger")
+        return jsonify([]), 403
+    shared_users = diary_entry.get_shared_users()
+    return jsonify([{"id": user.id, "username": user.username} for user in shared_users])
