@@ -2,6 +2,10 @@
 
 {% block title %}Home – Mood Diary Analysis{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
 {% block content %}
     <!-- Hero Section -->
     <section class="hero-section text-white d-flex align-items-center min-vh-75 pt-5 pb-5">
