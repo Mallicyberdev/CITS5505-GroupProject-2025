@@ -531,7 +531,6 @@ main {
 
 /* Diary Detail Page */
 .diary-content {
-    white-space: pre-wrap;
     font-size: 1rem;
     line-height: 1.6;
     color: #212529;

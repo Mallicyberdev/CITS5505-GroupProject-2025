@@ -53,6 +53,10 @@ def view_diary(diary_id):
         flash("You do not have permission to view this diary entry.", "danger")
         return redirect(url_for("main.home"))
 
+    diary_entry.content = diary_entry.content.replace("\r\n", "<br>").replace(
+        "\n", "<br>"
+    )
+
     return render_template(
         "dashboard/details.html", title="View Diary Entry", diary_entry=diary_entry
     )
