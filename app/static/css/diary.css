@@ -32,3 +32,47 @@
     font-size: 0.9rem;
     padding: 0.4em 0.8em;
 }
+
+
+/* --- Search and Filter Layout --- */
+.search-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;  
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Shared input/select style --- */
+.search-filter-row input,
+.search-filter-row select {
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 0.45rem 0.75rem;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Placeholder color */
+.search-filter-row input::placeholder {
+    color: var(--color-text-light);
+    opacity: 0.9;
+}
+
+/* Focus interaction */
+.search-filter-row input:focus,
+.search-filter-row select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.15rem rgba(var(--color-primary-rgb), 0.25);
+}
+
+.search-filter-row select#emotionFilter {
+    width: 180px;
+    max-width: 180px;
+}
