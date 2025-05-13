@@ -30,11 +30,11 @@
         --color-primary-rgb: 160, 98, 196;
         --color-secondary: #b37cd4;
         --color-secondary-rgb: 179, 124, 212;
-        --color-bg: #1a1a1a; /* Darker background */
-        --color-bg-alt: #212121; /* Slightly lighter dark */
+        --color-bg: #121212; /* Darker background */
+        --color-bg-alt: #1e1e1e; /* Slightly lighter dark */
         --color-text: #e0e0e0;
         --color-text-light: #aaaaaa;
-        --color-card-bg: #2c2c2c; /* Dark Card */
+        --color-card-bg: #2e2e2e; /* Dark Card */
         --color-card-bg-rgb: 44, 44, 44;
         --color-border: #444444;
         --color-bg-rgb: 26, 26, 26; /* For navbar in dark mode, Corresponds to #1a1a1a */
@@ -304,4 +304,14 @@ main {
 .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
     opacity: 0; /* Start hidden, animation will make it visible */
+}
+
+/* Custom SweetAlert2 minimal styling */
+.swal2-popup {
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
+}
+
+input:-webkit-autofill {
+    background-color: var(--color-card-bg) !important;
 }
