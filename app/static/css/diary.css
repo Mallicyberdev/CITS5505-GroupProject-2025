@@ -2,30 +2,56 @@
 .diary-card {
     background-color: var(--color-card-bg);
     border-radius: 1rem;
+    color: var(--color-text);
 }
 
-.shared-with-me {
-    background-color: #eaf6ff !important; /* Light blue */
-    border-left: 4px solid #0d6efd;
+/* Form Elements for Upload Page */
+form input.form-control,
+form textarea.form-control {
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Diary Detail Page */
+form input.form-control:hover,
+form textarea.form-control:hover {
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
+    border-color: var(--color-primary);
+}
+
+form input.form-control:focus,
+form textarea.form-control:focus {
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.15rem rgba(var(--color-primary-rgb), 0.25);
+    outline: none;
+}
+
+#diaryTitle::placeholder {
+    color: var(--color-text-light);
+}
+
+#diaryContent::placeholder {
+    color: var(--color-text-light);
+}
+
+
+/* Diary Card */
 .diary-content {
     font-size: 1rem;
     line-height: 1.6;
-    color: #212529;
+    color: var(--color-text);
     text-align: left;
 }
 
 .meta-info {
     font-size: 0.9rem;
     color: #6c757d;
-}
-
-.emotion-details-card {
-    background-color: #f1f3f5;
-    border-radius: 0.5rem;
-    padding: 1rem;
+    color: var(--color-text-light);
 }
 
 .emotion-badge-lg {
@@ -33,12 +59,38 @@
     padding: 0.4em 0.8em;
 }
 
+/* Detail Page */
+.diary-detail-card {
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
+    border-radius: 1rem;
+    border: 1px solid var(--color-border);
+}
+
+
+.emotion-details-card {
+    background-color: var(--color-card-bg);
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    padding: 1rem;
+}
+
+/* Share Model for Detail Page */
+.modal-content {
+
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
+    color: var(--color-text-light);
+    border: 1px solid var(--color-border);
+}
 
 /* --- Search and Filter Layout --- */
 .search-filter-row {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-end;  
+    justify-content: flex-end;
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
@@ -48,7 +100,7 @@
 .search-filter-row input,
 .search-filter-row select {
     background-color: var(--color-card-bg);
-    color: var(--color-text);
+    color: var(--color-text-light);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-md);
     padding: 0.45rem 0.75rem;
@@ -56,6 +108,10 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     width: 100%;
     max-width: 300px;
+}
+
+.search-filter-row input.form-control {
+    color: var(--color-text);
 }
 
 /* Placeholder color */
@@ -68,6 +124,7 @@
 .search-filter-row input:focus,
 .search-filter-row select:focus {
     outline: none;
+    background-color: var(--color-card-bg);
     border-color: var(--color-primary);
     box-shadow: 0 0 0 0.15rem rgba(var(--color-primary-rgb), 0.25);
 }
