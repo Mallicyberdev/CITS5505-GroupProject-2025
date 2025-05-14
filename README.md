@@ -75,7 +75,7 @@ CITS5505-GroupProject-2025/
 ├── config.py                # Configuration settings
 ├── requirements.txt         # Project dependencies
 └── run.py                   # Application entry point
-
+```
 
 ## Setup Instructions
 
