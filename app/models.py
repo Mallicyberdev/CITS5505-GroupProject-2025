@@ -1,3 +1,10 @@
+"""
+Database models for the Mood Diary Analysis application.
+
+This module defines the SQLAlchemy models for users, diary entries,
+and their relationships.
+"""
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy import func, or_
@@ -15,6 +22,16 @@ diary_shares = db.Table(
 
 
 class User(UserMixin, db.Model):
+    """User model for authentication and profile management.
+    
+    Attributes:
+        id (int): Primary key
+        username (str): Unique username
+        email (str): User's email address
+        password_hash (str): Hashed password
+        diary_entries (relationship): User's diary entries
+        shared_diaries (relationship): Diaries shared with this user
+    """
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -74,8 +91,7 @@ class DiaryEntry(db.Model):
     # Store the score of the dominant emotion
     dominant_emotion_score = db.Column(db.Float, nullable=True, index=True)
 
-    # Store the full list of emotion labels and scores as JSON
-    # Use SQLAlchemy's JSON type, which handles backend differences (including SQLite)
+    # Store the list of emotion labels and scores as JSON
     emotion_details_json = db.Column(db.JSON, nullable=True)
 
     # Flag to indicate if analysis has been performed
@@ -90,7 +106,7 @@ class DiaryEntry(db.Model):
     def __repr__(self):
         return f"<DiaryEntry {self.id} owner={self.owner.username!r}>"
 
-    # --- Helper Method to Update Emotion Data ---
+    # Update Emotion Data 
     def update_emotion_analysis(self, analysis_result):
         """
         Updates the diary entry with emotion analysis results.
@@ -111,7 +127,7 @@ class DiaryEntry(db.Model):
             self.analyzed = True  # Mark as analyzed, even if result was empty/invalid
             return False
 
-        # Our input is [[{...}, {...}]], we need the inner list [{...}, {...}]
+        
         emotion_scores = analysis_result[0]  # Get the actual list of scores
 
         if not emotion_scores:
@@ -139,12 +155,11 @@ class DiaryEntry(db.Model):
             or_(cls.owner_id == user_id, cls.shared_with.any(id=user_id))
         ).order_by(cls.created_at.desc())
 
-    # --- Methods for Managing Diary Sharing ---
+    # Methods for Managing Diary Sharing
 
     def is_shared_with_user(self, user_to_check: User) -> bool:
         """
         Checks if this diary entry is currently shared with the given user.
-        Note: `self.shared_with` is a dynamic query.
         """
         if not isinstance(user_to_check, User):
             raise TypeError("Expected a User object for user_to_check.")
@@ -156,33 +171,29 @@ class DiaryEntry(db.Model):
     def share_with_user(self, user_to_share: User) -> bool:
         """
         Shares this diary entry with the given user.
-        Returns True if successfully shared, False if already shared or user is owner.
         """
         if not isinstance(user_to_share, User):
             raise TypeError("Expected a User object for user_to_share.")
 
-        # Prevent sharing with the owner through the sharing mechanism
+        # Prevent sharing with the owner
         if self.owner_id == user_to_share.id:
             # print(f"Cannot share diary {self.id} with its owner {user_to_share.username}")
             return False
 
         if not self.is_shared_with_user(user_to_share):
             self.shared_with.append(user_to_share)
-            # db.session.add(self) # Not strictly necessary if self is already managed by session
-            # db.session.commit() # Commit should be handled by the caller/route
             return True
-        # print(f"Diary {self.id} is already shared with user {user_to_share.username}")
-        return False  # Already shared or attempted to share with owner
+        return False
 
     def unshare_from_user(self, user_to_unshare: User) -> bool:
         """
         Unshares this diary entry from the given user.
-        Returns True if successfully unshared, False if not shared with this user.
+        Returns True if successfully unshared, False if not shared.
         """
         if not isinstance(user_to_unshare, User):
             raise TypeError("Expected a User object for user_to_unshare.")
 
-        # Owner cannot be "unshared" from their own diary via this mechanism
+        # Owner cannot be "unshared" from their own diar
         if self.owner_id == user_to_unshare.id:
             return False
 
