@@ -27,8 +27,7 @@ macOS / Linux	bash\npython3 -m venv .venv\nsource .venv/bin/activate\n
 
 3. Install dependencies
 
-python -m pip install --upgrade pip
-pip install python-magic-bin==0.4.27     # Windows libmagic wheel
+python -m pip install --upgrade pip   
 pip install -r requirements.txt
 
 4. Prepare the database
@@ -43,9 +42,30 @@ python run.py
 
 Open http://localhost:5001 in your browser
 
-
-
-
 ## Test Instructions
 
 (To be added after development begins.)
+
+## Troubleshooting
+
+Permission denied when creating .venv
+
+	Close any IDE or terminal that might be using the folder. Delete the .venv folder manually, then retry the python -m venv .venv command as administrator. On PowerShell, you may also need: 
+                                                                       Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+Model download is extremely slow or interrupted
+
+	Make sure  no firewall/proxy blocking requests to Hugging Face. You can retry pip install -r requirements.txt or clear ~/.cache/huggingface.
+
+
+App starts but shows Internal Server Error	Check the console traceback.
+
+     The most common cause is missing dependencies.
+
+Changes to models are not reflected in the database
+	Run migrations again:
+                            flask db migrate -m 
+                            flask db upgrade
+
+App runs but nothing happens at localhost:5001
+	Ensure the app has fully started without exceptions. Try visiting http://127.0.0.1:5001 instead. If you're in VSCode, check if the debugger is holding the port.
