@@ -1,11 +1,24 @@
-# app/__init__.py
+"""
+Application factory module of the Mood Diary Analysis app.
+
+Initializes the Flask app and its extensions,
+configures the database, and mounts blueprints.
+"""
+
 import os
 from flask import Flask
 from .extensions import db, migrate, login_manager
-from config import Config  # Import configurations
-
+from config import Config
 
 def create_app(config_class=Config):
+    """Create and configure the Flask application.
+
+        Args:
+           config_class: Class to use for configuration (default: Config)
+
+        Returns:
+           Flask: Configured Flask application instance
+    """
     app = Flask(__name__, instance_relative_config=True)
 
     # Load configuration from config.py
