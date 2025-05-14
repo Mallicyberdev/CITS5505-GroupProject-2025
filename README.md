@@ -13,6 +13,25 @@ The application provides:
 
 This website has been constructed as coursework for the **CITS5505 Agile Web Development** unit at the **University of Western Australia**.
 It stands as proof of our commitment to applying agile principles to real issues in digital self-care and health.
+
+## Design
+
+Authentication & Security
+Registration, login, and logout are securely accessible to users. Sessions are managed by Flask-Login, and input validation is performed by WTForms. Passwords are stored safely by hashing them with Werkzeug.
+
+User Interface
+The interface is built with Bootstrap and CSS, giving a responsive layout that supports both desktop and mobile usage. Light/dark theme support and simple homepage, dashboard, and diary editor layouts have been included in the application.
+
+Diary Entry System
+Successful authentication allows users to add, modify, read, and delete their own diary entries. An entry has a title, a free-form body, and automatically filled timestamp for creation and last update.
+
+Entry Sharing
+Users have the option to share specific diary entries with other registered users. Access control is provided so that only authorized users can see shared content.
+
+Emotion Detection with NLP
+When an entry is saved, its text is processed by a pre-trained transformer model to detect emotional tone. The system stores the overall emotion label and score, along with the full emotion profile in JSON format.
+
+
 ## Group Members
 
 | UWA ID   | Name                              | GitHub Username |
