@@ -1,4 +1,10 @@
 # app/extensions.py
+"""
+Flask extensions initialization.
+
+This module initializes Flask extensions used throughout the application
+and configures their default settings.
+"""
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
