@@ -6,7 +6,7 @@ implements emotion analysis using transformer models.
 """
 
 # routes.py
-from flask import request, render_template, flash, url_for, jsonify
+from flask import request, render_template, flash, url_for
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
 
@@ -28,11 +28,11 @@ emotion_classifier = pipeline(
 @login_required
 def create_diary():
     """Create a new diary entry.
-    
+
     Returns:
         GET: Render diary creation form
         POST: Redirect to home page after creating entry
-        
+
     Requires:
         User authentication
     """
@@ -183,7 +183,10 @@ def share_diary(diary_id):
 
         if success_count > 0:
             db.session.commit()
-            flash(f"Diary sharing updated (changes applied to {success_count} user(s)).", "success")
+            flash(
+                f"Diary sharing updated (changes applied to {success_count} user(s)).",
+                "success",
+            )
         else:
             flash("No changes made to sharing settings.", "info")
     except Exception as e:
@@ -191,21 +194,3 @@ def share_diary(diary_id):
         flash(f"Failed to update diary sharing: {str(e)}", "danger")
 
     return redirect(url_for("data_handling.view_diary", diary_id=diary_id))
-
-
-@bp.route("/list_users", methods=["GET"])
-@login_required
-def list_users():
-    users = User.query.all()
-    return jsonify([{"id": user.id, "username": user.username} for user in users])
-
-
-@bp.route("/get_shared_users/<int:diary_id>", methods=["GET"])
-@login_required
-def get_shared_users(diary_id):
-    diary_entry = DiaryEntry.query.get_or_404(diary_id)
-    if diary_entry.owner_id != current_user.id:
-        flash("You can only view shared users for diaries you own.", "danger")
-        return jsonify([]), 403
-    shared_users = diary_entry.get_shared_users()
-    return jsonify([{"id": user.id, "username": user.username} for user in shared_users])

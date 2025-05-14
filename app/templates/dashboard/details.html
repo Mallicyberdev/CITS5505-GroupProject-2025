@@ -151,9 +151,11 @@
         </div>
 
         <!-- Share Modal -->
-        <div class="modal fade" id="shareDiaryModal" tabindex="-1" aria-labelledby="shareDiaryModalLabel" aria-hidden="true">
+        <div class="modal fade" id="shareDiaryModal" tabindex="-1" aria-labelledby="shareDiaryModalLabel"
+             aria-hidden="true">
             <div class="modal-dialog">
-                <form method="POST" action="{{ url_for('data_handling.share_diary', diary_id=diary_entry.id) }}" class="modal-content" id="shareDiaryForm">
+                <form method="POST" action="{{ url_for('data_handling.share_diary', diary_id=diary_entry.id) }}"
+                      class="modal-content" id="shareDiaryForm">
                     <div class="modal-header">
                         <h5 class="modal-title" id="shareDiaryModalLabel">Share Diary</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -175,55 +177,75 @@
             </div>
         </div>
     {% endif %}
+{% endblock %}
 
-    {% block scripts %}
-        {{ super() }}
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const shareModal = document.getElementById('shareDiaryModal');
-                shareModal.addEventListener('show.bs.modal', function () {
-                    // Fetch current shared users for this diary
-                    fetch('{{ url_for("data_handling.get_shared_users", diary_id=diary_entry.id) }}')
-                        .then(response => response.json())
-                        .then(sharedUsers => {
-                            const sharedUsernames = sharedUsers.map(user => user.username);
+{% block scripts %}
+    {{ super() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const shareModal = document.getElementById('shareDiaryModal');
+            const checkboxContainer = document.getElementById('user-checkboxes');
+            const currentUser = '{{ current_user.username }}';
 
-                            // Fetch all users
-                            fetch('{{ url_for("data_handling.list_users") }}')
-                                .then(response => response.json())
-                                .then(users => {
-                                    const checkboxContainer = document.getElementById('user-checkboxes');
-                                    checkboxContainer.innerHTML = '';
+            if (!shareModal || !checkboxContainer) return;
 
-                                    if (users.length === 0) {
-                                        checkboxContainer.innerHTML = '<p>No users available to share with.</p>';
-                                        return;
-                                    }
+            shareModal.addEventListener('show.bs.modal', async () => {
+                checkboxContainer.innerHTML = '<div class="spinner-border" role="status"></div>';
 
-                                    users.forEach(user => {
-                                        if (user.username !== '{{ current_user.username }}') {
-                                            const checkboxDiv = document.createElement('div');
-                                            checkboxDiv.className = 'form-check';
-                                            const isChecked = sharedUsernames.includes(user.username) ? 'checked' : '';
-                                            checkboxDiv.innerHTML = `
-                                                <input class="form-check-input" type="checkbox" name="shared_users" value="${user.username}" id="user-${user.id}" ${isChecked}>
-                                                <label class="form-check-label" for="user-${user.id}">${user.username}</label>
-                                            `;
-                                            checkboxContainer.appendChild(checkboxDiv);
-                                        }
-                                    });
-                                })
-                                .catch(error => {
-                                    console.error('Error fetching users:', error);
-                                    checkboxContainer.innerHTML = '<p>Error loading users.</p>';
-                                });
-                        })
-                        .catch(error => {
-                            console.error('Error fetching shared users:', error);
-                            checkboxContainer.innerHTML = '<p>Error loading shared users.</p>';
+                try {
+                    const [sharedRes, allRes] = await Promise.all([
+                        fetch('{{ url_for("auth.get_shared_users", diary_id=diary_entry.id) }}'),
+                        fetch('{{ url_for("auth.list_users") }}')
+                    ]);
+
+                    if (!sharedRes.ok || !allRes.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    const [sharedUsers, users] = await Promise.all([
+                        sharedRes.json(),
+                        allRes.json()
+                    ]);
+                    const sharedSet = new Set(sharedUsers.map(u => u.username));
+
+                    checkboxContainer.innerHTML = '';
+
+                    if (users.length === 0) {
+                        checkboxContainer.innerHTML = '<p>No users available to share with.</p>';
+                        return;
+                    }
+
+                    const frag = document.createDocumentFragment();
+                    users
+                        .filter(u => u.username !== currentUser)
+                        .forEach(user => {
+                            const div = document.createElement('div');
+                            div.className = 'form-check mb-2';
+
+                            const input = document.createElement('input');
+                            input.className = 'form-check-input';
+                            input.type = 'checkbox';
+                            input.name = 'shared_users';
+                            input.value = user.username;
+                            input.id = `user-${user.id}`;
+                            if (sharedSet.has(user.username)) input.checked = true;
+
+                            const label = document.createElement('label');
+                            label.className = 'form-check-label';
+                            label.htmlFor = input.id;
+                            label.textContent = user.username;
+
+                            div.append(input, label);
+                            frag.append(div);
                         });
-                });
+
+                    checkboxContainer.append(frag);
+                } catch (err) {
+                    console.error('Error loading share data:', err);
+                    checkboxContainer.innerHTML =
+                        '<p class="text-danger">Error loading users. Please try again later.</p>';
+                }
             });
-        </script>
-    {% endblock %}
+        });
+    </script>
 {% endblock %}
