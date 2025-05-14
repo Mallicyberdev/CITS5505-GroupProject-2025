@@ -25,36 +25,37 @@ It stands as proof of our commitment to applying agile principles to real issues
 ## Project Structure
 
 
+```text
 CITS5505-GroupProject-2025/
 ├── app/
 │   ├── __init__.py          # Application factory
 │   ├── models.py            # Database models
 │   ├── extensions.py        # Flask extensions
-│   ├── auth/               # Authentication blueprint
+│   ├── auth/                # Authentication blueprint
 │   │   ├── __init__.py
 │   │   ├── routes.py
 │   │   └── forms.py
-│   ├── data_handling/      # Diary handling blueprint
+│   ├── data_handling/       # Diary handling blueprint
 │   │   ├── __init__.py
 │   │   ├── routes.py
 │   │   └── analysis.py
-│   ├── main/              # Main routes blueprint
+│   ├── main/                # Main routes blueprint
 │   │   ├── __init__.py
 │   │   └── routes.py
-│   ├── static/            # Static assets
+│   ├── static/              # Static assets
 │   │   ├── css/
 │   │   ├── js/
 │   │   └── images/
-│   └── templates/         # HTML templates
+│   └── templates/           # HTML templates
 │       ├── auth/
 │       ├── diary/
 │       └── main/
-├── migrations/            # Database migrations
-├── tests/                # Test files
+├── migrations/              # Database migrations
+├── tests/                   # Test files
 ├── .gitignore
-├── config.py            # Configuration settings
-├── requirements.txt     # Project dependencies
-└── run.py              # Application entry point
+├── config.py                # Configuration settings
+├── requirements.txt         # Project dependencies
+└── run.py                   # Application entry point
 
 
 ## Setup Instructions
