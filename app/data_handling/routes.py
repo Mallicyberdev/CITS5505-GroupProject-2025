@@ -1,3 +1,10 @@
+"""
+Routes for diary entry management and emotion analysis.
+
+This module handles CRUD operations for diary entries and
+implements emotion analysis using transformer models.
+"""
+
 # routes.py
 from flask import request, render_template, flash, url_for, jsonify
 from flask_login import login_required, current_user
@@ -20,6 +27,15 @@ emotion_classifier = pipeline(
 @bp.route("/create_diary", methods=["GET", "POST"])
 @login_required
 def create_diary():
+    """Create a new diary entry.
+    
+    Returns:
+        GET: Render diary creation form
+        POST: Redirect to home page after creating entry
+        
+    Requires:
+        User authentication
+    """
     form = DiaryForm()
     if form.validate_on_submit():  # Handles POST and validation
         new_diary = DiaryEntry(
