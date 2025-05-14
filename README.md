@@ -2,8 +2,17 @@ CITS5505 Group Project
 
 ## Purpose
 
-This is the repository for our group project, a data analytics application for "project".
+**MoodDiary** is a web-based emotional journaling platform that enables users to reflect on their thoughts while automatically analyzing mood patterns over time.
 
+The application provides:
+- A secure and user-friendly interface for creating personal diary entries
+- Integrated sentiment analysis using natural language processing (NLP)
+- Visual representations of emotional trends to support mental health awareness
+- Entry sharing with role-based access for trusted collaborators
+- A responsive design, ensuring accessibility across devices
+
+This website has been constructed as coursework for the **CITS5505 Agile Web Development** unit at the **University of Western Australia**.
+It stands as proof of our commitment to applying agile principles to real issues in digital self-care and health.
 ## Group Members
 
 | UWA ID   | Name                              | GitHub Username |
@@ -11,7 +20,7 @@ This is the repository for our group project, a data analytics application for "
 | 24371476 | Mallikarjuna Vittalapura Ravi     | Mallicyberdev   |
 | 24281642 | Zhenyi Su                         | Mangomigu       |
 | 24374395 | Zeke Ding                         | Dzx1025         |
-| 24069389 | Dmitry Prytkov                    |                 |
+| 24069389 | Dmitry Prytkov                    | Gambit0070      |
 
 ## Project Structure
 
@@ -52,7 +61,7 @@ CITS5505-GroupProject-2025/
 
 1. Clone the repository
 
-git clone https://github.com/<ORG_OR_USER>/CITS5505-GroupProject-2025.git
+git clone https://github.com/Mallicyberdev/CITS5505-GroupProject-2025.git
 cd CITS5505-GroupProject-2025
 
 2. Create and activate a virtual environment
