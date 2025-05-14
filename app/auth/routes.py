@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from app import db
 from . import bp
 from .forms import LoginForm, RegistrationForm
-from app.models import User, DiaryEntry
+from app.models import User
 
 
 @bp.route("/login", methods=["GET", "POST"])
@@ -62,16 +62,3 @@ def register():
 def list_users():
     users = User.query.all()
     return jsonify([{"id": user.id, "username": user.username} for user in users])
-
-
-@bp.route("/get_shared_users/<int:diary_id>", methods=["GET"])
-@login_required
-def get_shared_users(diary_id):
-    diary_entry = DiaryEntry.query.get_or_404(diary_id)
-    if diary_entry.owner_id != current_user.id:
-        flash("You can only view shared users for diaries you own.", "danger")
-        return jsonify([]), 403
-    shared_users = diary_entry.get_shared_users()
-    return jsonify(
-        [{"id": user.id, "username": user.username} for user in shared_users]
-    )

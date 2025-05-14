@@ -194,7 +194,7 @@
 
                 try {
                     const [sharedRes, allRes] = await Promise.all([
-                        fetch('{{ url_for("auth.get_shared_users", diary_id=diary_entry.id) }}'),
+                        fetch('{{ url_for("data_handling.get_shared_users", diary_id=diary_entry.id) }}'),
                         fetch('{{ url_for("auth.list_users") }}')
                     ]);
 
