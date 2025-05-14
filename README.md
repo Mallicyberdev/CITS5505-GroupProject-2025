@@ -1,8 +1,9 @@
- CITS5505 Group Project
+CITS5505 Group Project
 
 ## Purpose
 
 This is the repository for our group project, a data analytics application for "project".
+
 ## Group Members
 
 | UWA ID   | Name                              | GitHub Username |
@@ -11,6 +12,41 @@ This is the repository for our group project, a data analytics application for "
 | 24281642 | Zhenyi Su                         | Mangomigu       |
 | 24374395 | Zeke Ding                         | Dzx1025         |
 | 24069389 | Dmitry Prytkov                    |                 |
+
+## Project Structure
+
+
+CITS5505-GroupProject-2025/
+├── app/
+│   ├── __init__.py          # Application factory
+│   ├── models.py            # Database models
+│   ├── extensions.py        # Flask extensions
+│   ├── auth/               # Authentication blueprint
+│   │   ├── __init__.py
+│   │   ├── routes.py
+│   │   └── forms.py
+│   ├── data_handling/      # Diary handling blueprint
+│   │   ├── __init__.py
+│   │   ├── routes.py
+│   │   └── analysis.py
+│   ├── main/              # Main routes blueprint
+│   │   ├── __init__.py
+│   │   └── routes.py
+│   ├── static/            # Static assets
+│   │   ├── css/
+│   │   ├── js/
+│   │   └── images/
+│   └── templates/         # HTML templates
+│       ├── auth/
+│       ├── diary/
+│       └── main/
+├── migrations/            # Database migrations
+├── tests/                # Test files
+├── .gitignore
+├── config.py            # Configuration settings
+├── requirements.txt     # Project dependencies
+└── run.py              # Application entry point
+
 
 ## Setup Instructions
 
@@ -42,6 +78,7 @@ python run.py
 
 Open http://localhost:5001 in your browser
 
+
 ## Test Instructions
 
 (To be added after development begins.)
@@ -56,7 +93,6 @@ Permission denied when creating .venv
 Model download is extremely slow or interrupted
 
 	Make sure  no firewall/proxy blocking requests to Hugging Face. You can retry pip install -r requirements.txt or clear ~/.cache/huggingface.
-
 
 App starts but shows Internal Server Error	Check the console traceback.
 
