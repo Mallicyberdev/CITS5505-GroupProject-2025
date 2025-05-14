@@ -1,4 +1,3 @@
-# app/auth/forms.py
 """
 Form definitions for user authentication.
 
@@ -8,8 +7,8 @@ and other authentication-related functionality.
 Classes:
     LoginForm: Handles user login form data and validation
     RegistrationForm: Handles new user registration form data and validation
-
 """
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
@@ -67,32 +66,14 @@ class RegistrationForm(FlaskForm):
     )
     submit = SubmitField("Register")
 
-    @classmethod
-    def validate_username(cls, username):
-        """Validate username uniqueness.
-        
-        Args:
-            username: The username to validate
-
-        Raises:
-            ValidationError: If username already exists in database
-        """
-
+    def validate_username(self, username):
+        """Validate username uniqueness."""
         user = db.session.scalar(select(User).filter_by(username=username.data))
         if user is not None:
             raise ValidationError("Please use a different username.")
 
-    @classmethod
-    def validate_email(cls, email):
-        """Validate email uniqueness.
-        
-        Args:
-            email: The email address to validate
-
-        Raises:
-            ValidationError: If email already exists in database
-        """
-        
+    def validate_email(self, email):
+        """Validate email uniqueness."""
         user = db.session.scalar(select(User).filter_by(email=email.data))
         if user is not None:
             raise ValidationError("Please use a different email address.")
