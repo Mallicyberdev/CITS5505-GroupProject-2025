@@ -91,7 +91,8 @@ class DiaryEntry(db.Model):
     # Store the score of the dominant emotion
     dominant_emotion_score = db.Column(db.Float, nullable=True, index=True)
 
-    # Store the list of emotion labels and scores as JSON
+    # Store the full list of emotion labels and scores as JSON
+    # Use SQLAlchemy's JSON type, which handles backend differences (including SQLite)
     emotion_details_json = db.Column(db.JSON, nullable=True)
 
     # Flag to indicate if analysis has been performed
@@ -127,7 +128,7 @@ class DiaryEntry(db.Model):
             self.analyzed = True  # Mark as analyzed, even if result was empty/invalid
             return False
 
-        
+        # Our input is [[{...}, {...}]], we need the inner list [{...}, {...}]
         emotion_scores = analysis_result[0]  # Get the actual list of scores
 
         if not emotion_scores:
@@ -171,6 +172,7 @@ class DiaryEntry(db.Model):
     def share_with_user(self, user_to_share: User) -> bool:
         """
         Shares this diary entry with the given user.
+        Returns True if successfully shared, False if already shared or user is owner.
         """
         if not isinstance(user_to_share, User):
             raise TypeError("Expected a User object for user_to_share.")
