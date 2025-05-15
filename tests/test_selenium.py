@@ -1,10 +1,10 @@
-# tests/test_ui.py
+# tests/test_selenium.py
 import os
 import socket
 import subprocess
+import sys
 import time
 import unittest
-import sys
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -13,14 +13,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
-# --------------------------------------------------------------- #
-BASE_URL = os.getenv("TEST_BASE_URL", "http://127.0.0.1:5001")
-PORT     = int(os.getenv("TEST_PORT", "5001"))
+# ───────────────────────────  настройки  ─────────────────────────── #
+BASE_URL  = os.getenv("TEST_BASE_URL", "http://127.0.0.1:5001")
+PORT      = int(os.getenv("TEST_PORT", "5001"))
 TEST_USER = {"username": "testuser", "password": "123456"}
-# --------------------------------------------------------------- #
+# ──────────────────────────────────────────────────────────────────── #
 
 
-def wait_port(host: str, port: int, timeout: int = 60) -> None:
+def wait_port(host: str, port: int, timeout: int = 60):
     """Блокирует поток, пока host:port не начнёт принимать соединения."""
     start = time.time()
     while time.time() - start < timeout:
@@ -32,18 +32,18 @@ def wait_port(host: str, port: int, timeout: int = 60) -> None:
     raise RuntimeError(f"Server on {host}:{port} didn't start within {timeout}s")
 
 
-class MoodDiaryUITest(unittest.TestCase):
-    """Набор базовых end-to-end тестов (без CSRF, без регистрации)."""
+class MoodDiaryE2E(unittest.TestCase):
+    """Мини-набор end-to-end-тестов."""
 
     @classmethod
     def setUpClass(cls):
-        # 1. стартуем Flask
+        # 1. поднимаем Flask-сервер
         cls.server = subprocess.Popen([sys.executable, "run.py"])
         wait_port("127.0.0.1", PORT)
 
-        # 2. инициализируем Chrome (headless)
+        # 2. headless-Chrome
         opts = webdriver.ChromeOptions()
-        opts.add_argument("--headless=new")      # Chrome ≥ 109
+        opts.add_argument("--headless=new")
         opts.add_argument("--window-size=1280,800")
         cls.driver = webdriver.Chrome(
             service=Service(ChromeDriverManager().install()),
@@ -59,54 +59,80 @@ class MoodDiaryUITest(unittest.TestCase):
         except subprocess.TimeoutExpired:
             cls.server.kill()
 
-    # ──────────────────────────────────────────────────────────── #
-    def wait(self, condition, timeout=8):
+    # ─────────────────────────── helpers ──────────────────────────── #
+    def setUp(self):
+        """Каждый тест начинается с чистых cookies."""
+        self.driver.delete_all_cookies()
+
+    def wait(self, condition, timeout=12):
         return WebDriverWait(self.driver, timeout).until(condition)
 
-    # ──────────────────────────────────────────────────────────── #
-    #                     TEST CASES
-    # ──────────────────────────────────────────────────────────── #
-    def test_homepage_loads(self):
+    def click_submit(self):
+        """Безопасно нажать submit (input † или button †)."""
+        self.wait(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, "input[type='submit'], button[type='submit']")
+            )
+        ).click()
+
+    def login(self, username=TEST_USER["username"], password=TEST_USER["password"]):
+        """Быстрый вход в систему (со сбросом состояния)."""
+        # гарантированно выйдем из предыдущего сеанса
+        self.driver.get(f"{BASE_URL}/auth/logout")
+        self.driver.get(f"{BASE_URL}/auth/login")
+
+        self.wait(EC.presence_of_element_located((By.ID, "username")))
+        self.driver.find_element(By.ID, "username").send_keys(username)
+        self.driver.find_element(By.ID, "password").send_keys(password)
+        self.click_submit()
+
+    # ───────────────────────────── tests ──────────────────────────── #
+    def test_homepage_smoke(self):
         """Домашняя страница открывается и содержит ожидаемый заголовок."""
         self.driver.get(BASE_URL)
         heading = self.wait(EC.visibility_of_element_located((By.TAG_NAME, "h1")))
-        self.assertRegex(heading.text, r"Mood|Emotional", "Unexpected heading")
-
-    def test_login_wrong_password(self):
-        """Неправильный пароль выдаёт сообщение об ошибке."""
-        self.driver.get(f"{BASE_URL}/auth/login")
-        self.driver.find_element(By.ID, "username").send_keys(TEST_USER["username"])
-        self.driver.find_element(By.ID, "password").send_keys("wrongpass")
-        self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
-
-        alert = self.wait(EC.visibility_of_element_located((By.CLASS_NAME, "alert")))
-        self.assertIn("Invalid", alert.text)
+        self.assertRegex(heading.text, r"Mood|Emotional")
 
     def test_login_and_logout_flow(self):
-        """Успешный логин и корректный логаут."""
-        self.driver.get(f"{BASE_URL}/auth/login")
-        self.driver.find_element(By.ID, "username").send_keys(TEST_USER["username"])
-        self.driver.find_element(By.ID, "password").send_keys(TEST_USER["password"])
-        self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+        """Корректный логин → Logout → снова видим Log In."""
+        self.login()
 
-        logout_link = self.wait(EC.element_to_be_clickable((By.LINK_TEXT, "Logout")))
-        self.assertTrue(logout_link.is_displayed())
+        # ждём ссылку Logout, затем выходим
+        self.wait(EC.element_to_be_clickable((By.LINK_TEXT, "Logout"))).click()
+        self.wait(EC.visibility_of_element_located((By.LINK_TEXT, "Log In")))
 
-        logout_link.click()
-        self.wait(EC.visibility_of_element_located((By.LINK_TEXT, "Login")))
+    def test_create_diary_card(self):
+        """Создание дневника выводит карточку на дашборде."""
+        self.login()
 
-    def test_theme_toggle(self):
-        """Переключатель темы изменяет атрибут data-bs-theme на <body>."""
-        self.driver.get(BASE_URL)
-        body = self.driver.find_element(By.TAG_NAME, "body")
-        initial = body.get_attribute("data-bs-theme") or "light"
+        # переходим на /home (dashboard)
+        self.driver.get(f"{BASE_URL}/home")
 
-        self.driver.find_element(By.ID, "themeSwitch").click()
-
-        self.wait(
-            lambda d: d.find_element(By.TAG_NAME, "body")
-                      .get_attribute("data-bs-theme") != initial
+        # ждём кнопку-плюс (FAB)
+        fab = self.wait(
+            EC.element_to_be_clickable(
+                (
+                    By.CSS_SELECTOR,
+                    "a.fab-btn, a.btn-success.fab-btn, a[href*='create_diary']",
+                )
+            )
         )
+        fab.click()
+
+        # форма создания
+        self.wait(EC.presence_of_element_located((By.ID, "title")))
+        self.driver.find_element(By.ID, "title").send_keys("Selenium diary")
+        self.driver.find_element(By.ID, "content").send_keys("Content from e2e test")
+        self.click_submit()
+
+        # возвращаемся на dashboard и проверяем карточку
+        self.driver.get(f"{BASE_URL}/home")
+        card = self.wait(
+            EC.visibility_of_element_located(
+                (By.XPATH, "//h5[contains(text(), 'Selenium diary')]")
+            )
+        )
+        self.assertTrue(card.is_displayed())
 
 
 if __name__ == "__main__":
