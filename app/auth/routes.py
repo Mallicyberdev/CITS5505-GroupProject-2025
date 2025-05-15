@@ -12,7 +12,7 @@ from app.models import User
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for("main.index"))  # Redirect logged-in users
+        return redirect(url_for("main.home"))  # Redirect logged-in users
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -27,7 +27,7 @@ def login():
         # Redirect to the page user was trying to access, or index
         next_page = request.args.get("next")
         if not next_page or urlparse(next_page).netloc != "":
-            next_page = url_for("main.index")
+            next_page = url_for("main.home")
         return redirect(next_page)
     return render_template("auth/login.html", title="Sign In", form=form)
 
@@ -43,7 +43,7 @@ def logout():
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for("main.index"))
+        return redirect(url_for("main.home"))
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
@@ -53,5 +53,5 @@ def register():
         flash("Congratulations, you are now a registered user!", "success")
         # Log the user in automatically after registration
         login_user(user)
-        return redirect(url_for("main.index"))
+        return redirect(url_for("main.home"))
     return render_template("auth/register.html", title="Register", form=form)
