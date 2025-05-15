@@ -43,15 +43,25 @@
                                 {% if diary_entry.dominant_emotion_label %}
                                     <p>
                                         Dominant Emotion:
-                                        <span class="badge rounded-pill emotion-badge-lg
-                                            {% if diary_entry.dominant_emotion_label == 'joy' or diary_entry.dominant_emotion_label == 'love' %} bg-success
-                                            {% elif diary_entry.dominant_emotion_label == 'sadness' or diary_entry.dominant_emotion_label == 'fear' %} bg-info text-dark
-                                            {% elif diary_entry.dominant_emotion_label == 'anger' %} bg-danger
-                                            {% elif diary_entry.dominant_emotion_label == 'surprise' %} bg-warning text-dark
-                                            {% else %} bg-secondary
-                                            {% endif %}">
-                                                {{ diary_entry.dominant_emotion_label }} ({{ "%.0f"|format(diary_entry.dominant_emotion_score * 100) }}%)
-                                        </span>
+                                        {% set emotion_label = diary_entry.dominant_emotion_label %}
+                                        {% set emotion_score_percent = "%.0f"|format(diary_entry.dominant_emotion_score * 100) %}
+
+                                        {% set emotion_url = url_for('main.home', emotion_tag=emotion_label) if emotion_label else '#' %}
+
+                                        <a href="{{ emotion_url }}"
+                                           class="btn btn-sm rounded-pill emotion-badge-btn
+                                                {% if emotion_label == 'joy' or emotion_label == 'love' %} btn-success
+                                                {% elif emotion_label == 'sadness' or emotion_label == 'fear' %} btn-info text-dark
+                                                {% elif emotion_label == 'anger' %} btn-danger
+                                                {% elif emotion_label == 'surprise' %} btn-warning text-dark
+                                                {% else %} btn-secondary
+                                                {% endif %}"
+                                           role="button"
+                                                {# Add title attribute for better UX #}
+                                           title="Find more entries with {{ emotion_label|capitalize }} emotion">
+
+                                            {{ emotion_label|capitalize }} ({{ emotion_score_percent }}%)
+                                        </a>
                                     </p>
 
                                     {% if diary_entry.emotion_details_json %}
@@ -126,9 +136,10 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <form action="{{ url_for('data_handling.delete_diary', diary_id=diary_entry.id) }}"
-                              method="POST"
+                        <form method="POST"
+                              action="{{ url_for('data_handling.delete_diary', diary_id=diary_entry.id) }}"
                               style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <button type="submit" class="btn btn-danger">Delete Permanently</button>
                         </form>
                     </div>

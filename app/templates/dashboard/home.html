@@ -9,26 +9,27 @@
         <!-- Seach and Filter Row -->
         <div class="search-filter-row my-4">
             <!-- Search -->
-            <label for="searchInput">
-                <input type="text"
-                       id="searchInput"
-                       class="form-control"
-                       placeholder="Search diaries...">
-            </label>
+            <label for="searchInput"></label>
+            <input type="text"
+                   id="searchInput"
+                   class="form-control"
+                   placeholder="Search diaries...">
 
             <!-- Filter -->
-            <label for="emotionFilter">
-                <select id="emotionFilter" class="form-select">
-                    <option value="">All Emotions</option>
-                    <option value="joy">Joy</option>
-                    <option value="surprise">Surprise</option>
-                    <option value="neutral">Neutral</option>
-                    <option value="sadness">Sadness</option>
-                    <option value="fear">Fear</option>
-                    <option value="anger">Anger</option>
-                    <option value="disgust">Disgust</option>
-                </select>
-            </label>
+            <label for="emotionFilter" class="form-label visually-hidden">Filter by Emotion</label>
+            <select id="emotionFilter" class="form-select">
+                <option value="">All Emotions</option>
+                {# Dynamically set the 'selected' attribute based on current_emotion_filter from backend #}
+                <option value="joy" {% if current_emotion_filter == 'joy' %}selected{% endif %}>Joy</option>
+                <option value="surprise" {% if current_emotion_filter == 'surprise' %}selected{% endif %}>Surprise
+                </option>
+                <option value="neutral" {% if current_emotion_filter == 'neutral' %}selected{% endif %}>Neutral</option>
+                {# You might not have 'neutral' as a dominant emotion #}
+                <option value="sadness" {% if current_emotion_filter == 'sadness' %}selected{% endif %}>Sadness</option>
+                <option value="fear" {% if current_emotion_filter == 'fear' %}selected{% endif %}>Fear</option>
+                <option value="anger" {% if current_emotion_filter == 'anger' %}selected{% endif %}>Anger</option>
+                <option value="disgust" {% if current_emotion_filter == 'disgust' %}selected{% endif %}>Disgust</option>
+            </select>
         </div>
 
         {% if diaries %}
@@ -37,7 +38,6 @@
                     <div class="col">
                         <div class="card h-100 diary-card shadow-sm">
                             <div class="card-body d-flex flex-column">
-
 
                                 <h5 class="card-title">{{ diary.title }}</h5>
 
@@ -117,7 +117,7 @@
 
         function filterDiaries() {
             const query = normalize(document.getElementById("searchInput").value);
-            const selectedEmotion = document.getElementById("emotionFilter").value;
+
             const cards = document.querySelectorAll(".diary-card");
 
             let matchCount = 0;
@@ -125,13 +125,8 @@
             cards.forEach(card => {
                 const title = normalize(card.querySelector(".card-title").textContent);
                 const content = normalize(card.querySelector(".diary-content").textContent);
-                const badge = card.querySelector(".emotion-badge");
-                const emotion = badge ? normalize(badge.textContent.split(':')[1]?.split('(')[0] || '') : "";
 
-                const matchesText = title.includes(query) || content.includes(query);
-                const matchesEmotion = !selectedEmotion || emotion.includes(selectedEmotion);
-
-                const isVisible = matchesText && matchesEmotion;
+                const isVisible = title.includes(query) || content.includes(query);
                 card.closest(".col").style.display = isVisible ? "" : "none";
 
                 if (isVisible) matchCount++;
@@ -144,7 +139,93 @@
         }
 
         document.getElementById("searchInput").addEventListener("input", filterDiaries);
-        document.getElementById("emotionFilter").addEventListener("change", filterDiaries);
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const emotionFilterSelect = document.getElementById("emotionFilter");
+            const searchInput = document.getElementById("searchInput"); // Keep for client-side text search
+
+            // Function for client-side text filtering (applied after server-side emotion filter)
+            function filterDiariesByText() {
+                const query = searchInput.value.toLowerCase().trim();
+                const cards = document.querySelectorAll(".diary-card"); // Assuming .diary-card is on the card itself
+                let matchCount = 0;
+                let visibleCardsAfterServerFilter = 0;
+
+                cards.forEach(cardContainer => { // Iterate over the .col or a common parent if .diary-card is nested
+                    const card = cardContainer.querySelector ? cardContainer.querySelector(".diary-card") : cardContainer;
+                    if (!card) return;
+
+                    // Check if card is visible after server-side filtering (it should be, as they are rendered)
+                    // This count helps determine if "no results" is due to text search or server filter
+                    visibleCardsAfterServerFilter++;
+
+                    const titleElement = card.querySelector(".card-title");
+                    const contentElement = card.querySelector(".diary-content-preview"); // Assuming you have a preview
+
+                    const title = titleElement ? titleElement.textContent.toLowerCase().trim() : "";
+                    // Be careful with .diary-content, it might be very long or contain HTML.
+                    // It's better to have a dedicated preview text element for client-side search.
+                    const content = contentElement ? contentElement.textContent.toLowerCase().trim() : "";
+
+                    const matchesText = !query || title.includes(query) || content.includes(query);
+
+                    // The card's parent column visibility is controlled
+                    const cardParentCol = card.closest(".col"); // Or whatever is the immediate repeating parent in the grid
+                    if (cardParentCol) {
+                        cardParentCol.style.display = matchesText ? "" : "none";
+                        if (matchesText) matchCount++;
+                    } else { // Fallback if no .col parent, hide card directly
+                        card.style.display = matchesText ? "" : "none";
+                        if (matchesText) matchCount++;
+                    }
+                });
+
+                const noResultMsg = document.getElementById("noResultsMessage");
+                if (noResultMsg) {
+                    // Show "no results" if:
+                    // 1. Server returned cards, but text search found none.
+                    // 2. Server returned no cards (this should ideally be handled by a server-rendered message,
+                    //    but client-side can also show it if visibleCardsAfterServerFilter is 0).
+                    if (visibleCardsAfterServerFilter > 0 && matchCount === 0) {
+                        noResultMsg.style.display = "block";
+                        noResultMsg.textContent = "No diaries match your current search criteria.";
+                    } else if (visibleCardsAfterServerFilter === 0 && !document.querySelector('.diary-card')) {
+                        // This case is tricky because if server returned 0 cards, this JS might not have much to do
+                        // Server should ideally render a "no results for this emotion filter" message
+                        noResultMsg.style.display = "block";
+                        noResultMsg.textContent = "No diaries found for the selected emotion.";
+                    } else {
+                        noResultMsg.style.display = "none";
+                    }
+                }
+            }
+
+            if (emotionFilterSelect) {
+                emotionFilterSelect.addEventListener("change", function () {
+                    const selectedEmotion = this.value;
+                    const currentUrl = new URL(window.location.href);
+
+                    if (selectedEmotion) {
+                        currentUrl.searchParams.set("emotion_tag", selectedEmotion);
+                    } else {
+                        currentUrl.searchParams.delete("emotion_tag");
+                    }
+                    // Preserve other existing query parameters if any, for example, pagination
+                    // currentUrl.searchParams.set("page", "1"); // Reset to page 1 on filter change
+
+                    window.location.href = currentUrl.toString();
+                });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener("input", filterDiariesByText);
+                // Initial text filter on page load if search input has a value (e.g., from browser history)
+                if (searchInput.value) {
+                    filterDiariesByText();
+                }
+            }
+        });
     </script>
 {% endblock %}
 
