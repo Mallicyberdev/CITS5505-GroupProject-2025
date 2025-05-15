@@ -32,7 +32,7 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
+            <a class="navbar-brand fw-bold" href="{{ url_for('main.home') }}">
                 MoodDiary
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
@@ -81,7 +81,7 @@
         {% if messages %}
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
-                    const flashes = {{ messages | tojson }};
+                    const flashes = JSON.parse('{{ messages | tojson | safe }}');
                     flashes.forEach(([category, message]) => {
                         let icon = 'info';
                         if (category === 'success') icon = 'success';
