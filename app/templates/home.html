@@ -28,7 +28,6 @@
         </div>
 
 
-
         <!-- Diary Cards -->
         <div class="text-center mb-3">
         </div>
@@ -39,7 +38,7 @@
                     <div class="col">
                         <div class="card h-100 diary-card shadow-sm">
                             <div class="card-body d-flex flex-column">
-  
+
 
                                 <h5 class="card-title">{{ diary.title }}</h5>
                                 <p class="card-text text-muted small">
@@ -116,46 +115,45 @@
             </a>
         </div>
     {% endif %}
+{% endblock %}
 
 {% block scripts %}
-<script>
-    function normalize(text) {
-        return text.toLowerCase().trim();
-    }
+    {{ super() }}
+    <script>
+        function normalize(text) {
+            return text.toLowerCase().trim();
+        }
 
-function filterDiaries() {
-    const query = normalize(document.getElementById("searchInput").value);
-    const selectedEmotion = document.getElementById("emotionFilter").value;
-    const cards = document.querySelectorAll(".diary-card");
+        function filterDiaries() {
+            const query = normalize(document.getElementById("searchInput").value);
+            const selectedEmotion = document.getElementById("emotionFilter").value;
+            const cards = document.querySelectorAll(".diary-card");
 
-    let matchCount = 0;
+            let matchCount = 0;
 
-    cards.forEach(card => {
-        const title = normalize(card.querySelector(".card-title").textContent);
-        const content = normalize(card.querySelector(".diary-content").textContent);  
-        const badge = card.querySelector(".emotion-badge");
-        const emotion = badge ? normalize(badge.textContent.split(':')[1]?.split('(')[0] || '') : "";
+            cards.forEach(card => {
+                const title = normalize(card.querySelector(".card-title").textContent);
+                const content = normalize(card.querySelector(".diary-content").textContent);
+                const badge = card.querySelector(".emotion-badge");
+                const emotion = badge ? normalize(badge.textContent.split(':')[1]?.split('(')[0] || '') : "";
 
-        const matchesText = title.includes(query) || content.includes(query);
-        const matchesEmotion = !selectedEmotion || emotion.includes(selectedEmotion);
+                const matchesText = title.includes(query) || content.includes(query);
+                const matchesEmotion = !selectedEmotion || emotion.includes(selectedEmotion);
 
-        const isVisible = matchesText && matchesEmotion;
-        card.closest(".col").style.display = isVisible ? "" : "none";
+                const isVisible = matchesText && matchesEmotion;
+                card.closest(".col").style.display = isVisible ? "" : "none";
 
-        if (isVisible) matchCount++;
-    });
+                if (isVisible) matchCount++;
+            });
 
-    const noResultMsg = document.getElementById("noResultsMessage");
-    if (noResultMsg) {
-        noResultMsg.style.display = matchCount === 0 ? "block" : "none";
-    }
-}
+            const noResultMsg = document.getElementById("noResultsMessage");
+            if (noResultMsg) {
+                noResultMsg.style.display = matchCount === 0 ? "block" : "none";
+            }
+        }
 
-    document.getElementById("searchInput").addEventListener("input", filterDiaries);
-    document.getElementById("emotionFilter").addEventListener("change", filterDiaries);
-</script>
+        document.getElementById("searchInput").addEventListener("input", filterDiaries);
+        document.getElementById("emotionFilter").addEventListener("change", filterDiaries);
+    </script>
 {% endblock %}
 
-
-
-{% endblock %}

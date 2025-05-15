@@ -1,5 +1,5 @@
 # app/auth/routes.py
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 
 from urllib.parse import urlparse
@@ -55,3 +55,10 @@ def register():
         login_user(user)
         return redirect(url_for("main.index"))
     return render_template("auth/register.html", title="Register", form=form)
+
+
+@bp.route("/list_users", methods=["GET"])
+@login_required
+def list_users():
+    users = User.query.all()
+    return jsonify([{"id": user.id, "username": user.username} for user in users])
