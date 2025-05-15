@@ -143,63 +143,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const emotionFilterSelect = document.getElementById("emotionFilter");
-            const searchInput = document.getElementById("searchInput"); // Keep for client-side text search
-
-            // Function for client-side text filtering (applied after server-side emotion filter)
-            function filterDiariesByText() {
-                const query = searchInput.value.toLowerCase().trim();
-                const cards = document.querySelectorAll(".diary-card"); // Assuming .diary-card is on the card itself
-                let matchCount = 0;
-                let visibleCardsAfterServerFilter = 0;
-
-                cards.forEach(cardContainer => { // Iterate over the .col or a common parent if .diary-card is nested
-                    const card = cardContainer.querySelector ? cardContainer.querySelector(".diary-card") : cardContainer;
-                    if (!card) return;
-
-                    // Check if card is visible after server-side filtering (it should be, as they are rendered)
-                    // This count helps determine if "no results" is due to text search or server filter
-                    visibleCardsAfterServerFilter++;
-
-                    const titleElement = card.querySelector(".card-title");
-                    const contentElement = card.querySelector(".diary-content-preview"); // Assuming you have a preview
-
-                    const title = titleElement ? titleElement.textContent.toLowerCase().trim() : "";
-                    // Be careful with .diary-content, it might be very long or contain HTML.
-                    // It's better to have a dedicated preview text element for client-side search.
-                    const content = contentElement ? contentElement.textContent.toLowerCase().trim() : "";
-
-                    const matchesText = !query || title.includes(query) || content.includes(query);
-
-                    // The card's parent column visibility is controlled
-                    const cardParentCol = card.closest(".col"); // Or whatever is the immediate repeating parent in the grid
-                    if (cardParentCol) {
-                        cardParentCol.style.display = matchesText ? "" : "none";
-                        if (matchesText) matchCount++;
-                    } else { // Fallback if no .col parent, hide card directly
-                        card.style.display = matchesText ? "" : "none";
-                        if (matchesText) matchCount++;
-                    }
-                });
-
-                const noResultMsg = document.getElementById("noResultsMessage");
-                if (noResultMsg) {
-                    // Show "no results" if:
-                    // 1. Server returned cards, but text search found none.
-                    // 2. Server returned no cards (this should ideally be handled by a server-rendered message,
-                    //    but client-side can also show it if visibleCardsAfterServerFilter is 0).
-                    if (visibleCardsAfterServerFilter > 0 && matchCount === 0) {
-                        noResultMsg.style.display = "block";
-                        noResultMsg.textContent = "No diaries match your current search criteria.";
-                    } else if (visibleCardsAfterServerFilter === 0 && !document.querySelector('.diary-card')) {
-                        // This case is tricky because if server returned 0 cards, this JS might not have much to do
-                        // Server should ideally render a "no results for this emotion filter" message
-                        noResultMsg.style.display = "block";
-                        noResultMsg.textContent = "No diaries found for the selected emotion.";
-                    } else {
-                        noResultMsg.style.display = "none";
-                    }
-                }
-            }
 
             if (emotionFilterSelect) {
                 emotionFilterSelect.addEventListener("change", function () {
@@ -211,19 +154,9 @@
                     } else {
                         currentUrl.searchParams.delete("emotion_tag");
                     }
-                    // Preserve other existing query parameters if any, for example, pagination
-                    // currentUrl.searchParams.set("page", "1"); // Reset to page 1 on filter change
 
                     window.location.href = currentUrl.toString();
                 });
-            }
-
-            if (searchInput) {
-                searchInput.addEventListener("input", filterDiariesByText);
-                // Initial text filter on page load if search input has a value (e.g., from browser history)
-                if (searchInput.value) {
-                    filterDiariesByText();
-                }
             }
         });
     </script>
