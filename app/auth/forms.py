@@ -28,11 +28,13 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField("Register")
 
     def validate_username(self, username):
+        """Check if the username is already taken in the database."""
         user = db.session.scalar(select(User).filter_by(username=username.data))
         if user is not None:
             raise ValidationError("Please use a different username.")
 
     def validate_email(self, email):
+        """Check if the email address is already registered in the database."""
         user = db.session.scalar(select(User).filter_by(email=email.data))
         if user is not None:
             raise ValidationError("Please use a different email address.")
