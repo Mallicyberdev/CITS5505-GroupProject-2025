@@ -39,40 +39,26 @@
                             <hr>
                             <div class="mt-4">
                                 <h5 class="mb-3"><i class="bi bi-emoji-smile"></i> Emotion Analysis</h5>
+
                                 {% if diary_entry.dominant_emotion_label %}
                                     <p>
                                         Dominant Emotion:
                                         <span class="badge rounded-pill emotion-badge-lg
-                                        {% if diary_entry.dominant_emotion_label == 'joy' or diary_entry.dominant_emotion_label == 'love' %} bg-success
-                                        {% elif diary_entry.dominant_emotion_label == 'sadness' or diary_entry.dominant_emotion_label == 'fear' %} bg-info text-dark
-                                        {% elif diary_entry.dominant_emotion_label == 'anger' %} bg-danger
-                                        {% elif diary_entry.dominant_emotion_label == 'surprise' %} bg-warning text-dark
-                                        {% else %} bg-secondary
-                                        {% endif %}">
-                                {{ diary_entry.dominant_emotion_label }}
-                                ({{ "%.0f"|format(diary_entry.dominant_emotion_score * 100) }}%)
-                            </span>
+                                            {% if diary_entry.dominant_emotion_label == 'joy' or diary_entry.dominant_emotion_label == 'love' %} bg-success
+                                            {% elif diary_entry.dominant_emotion_label == 'sadness' or diary_entry.dominant_emotion_label == 'fear' %} bg-info text-dark
+                                            {% elif diary_entry.dominant_emotion_label == 'anger' %} bg-danger
+                                            {% elif diary_entry.dominant_emotion_label == 'surprise' %} bg-warning text-dark
+                                            {% else %} bg-secondary
+                                            {% endif %}">
+                                                {{ diary_entry.dominant_emotion_label }} ({{ "%.0f"|format(diary_entry.dominant_emotion_score * 100) }}%)
+                                        </span>
                                     </p>
+
                                     {% if diary_entry.emotion_details_json %}
-                                        <div class="card emotion-details-card mt-3">
-                                            <div class="card-body p-3">
-                                                <h6 class="card-subtitle mb-2">Full Emotion Scores:</h6>
-                                                <ul class="list-unstyled mb-0">
-                                                    {% for emotion in diary_entry.emotion_details_json %}
-                                                        <li>
-                                                            {{ emotion.label|capitalize }}: {{ "%.1f"|format(emotion.score * 100) }}%
-                                                            <div class="progress" style="height: 5px;"
-                                                                 role="progressbar"
-                                                                 aria-label="{{ emotion.label }} score"
-                                                                 aria-valuenow="{{ emotion.score * 100 }}"
-                                                                 aria-valuemin="0"
-                                                                 aria-valuemax="100">
-                                                                <div class="progress-bar"
-                                                                     style="width: {{ emotion.score * 100 }}%"></div>
-                                                            </div>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
+                                        <div class="mt-3">
+                                            <h6 class="mb-2">Full Emotion Scores Radar Chart:</h6>
+                                            <div style="max-width: 400px; margin: auto;">
+                                                <canvas id="emotionRadarChart"></canvas>
                                             </div>
                                         </div>
                                     {% endif %}
@@ -182,6 +168,7 @@
 
 {% block scripts %}
     {{ super() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const shareModal = document.getElementById('shareDiaryModal');
@@ -249,4 +236,152 @@
             });
         });
     </script>
+
+    {% if diary_entry.analyzed and diary_entry.emotion_details_json %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const emotionData = {{ diary_entry.emotion_details_json | tojson }};
+                const radarChartCanvas = document.getElementById('emotionRadarChart');
+
+                if (!emotionData || emotionData.length === 0 || !radarChartCanvas) {
+                    if (radarChartCanvas) {
+                        const ctx = radarChartCanvas.getContext('2d');
+                        ctx.textAlign = 'center';
+                        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-text-muted').trim();
+                        ctx.fillText('No detailed emotion data available to display chart.', radarChartCanvas.width / 2, radarChartCanvas.height / 2);
+                    }
+                    return; // Exit if no data or canvas
+                }
+
+                // Function to get CSS variable values
+                function getCssVariable(variableName) {
+                    return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+                }
+
+                // Function to create or update the chart
+                function createOrUpdateRadarChart() {
+                    // Determine current color scheme
+                    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                    // Define colors based on the mode
+                    let chartPrimaryColor, chartPrimaryColorRGB, chartTextMutedColor, chartGridColor,
+                        chartPointLabelColor;
+
+                    if (isDarkMode) {
+                        chartPrimaryColor = getCssVariable('--color-primary'); // e.g., #a062c4
+                        chartPrimaryColorRGB = getCssVariable('--color-primary-rgb'); // e.g., 160, 98, 196
+                        chartTextMutedColor = getCssVariable('--color-text-light'); // Lighter text for dark mode
+                        chartGridColor = 'rgba(255, 255, 255, 0.1)'; // Lighter grid lines for dark mode
+                        chartPointLabelColor = getCssVariable('--color-text'); // Emotion labels around chart
+                    } else {
+                        chartPrimaryColor = getCssVariable('--color-primary'); // e.g., #8e44ad
+                        chartPrimaryColorRGB = getCssVariable('--color-primary-rgb'); // e.g., 142, 68, 173
+                        chartTextMutedColor = getCssVariable('--color-text-muted');
+                        chartGridColor = 'rgba(0, 0, 0, 0.1)'; // Darker grid lines for light mode
+                        chartPointLabelColor = getCssVariable('--color-text');
+                    }
+
+                    const chartBackgroundColor = `rgba(${chartPrimaryColorRGB}, 0.2)`;
+                    const chartBorderColor = chartPrimaryColor;
+                    const chartPointBackgroundColor = chartBorderColor;
+
+
+                    const labels = emotionData.map(emotion => emotion.label.charAt(0).toUpperCase() + emotion.label.slice(1));
+                    const scores = emotionData.map(emotion => emotion.score * 100);
+
+                    // Destroy existing chart instance if it exists, before creating a new one
+                    // This is important for theme changes
+                    if (window.myEmotionRadarChart instanceof Chart) {
+                        window.myEmotionRadarChart.destroy();
+                    }
+
+                    window.myEmotionRadarChart = new Chart(radarChartCanvas, {
+                        type: 'radar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Emotion Score (%)',
+                                data: scores,
+                                backgroundColor: chartBackgroundColor,
+                                borderColor: chartBorderColor,
+                                borderWidth: 2,
+                                pointBackgroundColor: chartPointBackgroundColor,
+                                pointBorderColor: isDarkMode ? getCssVariable('--color-card-bg') : '#fff', // Point border contrasts with card bg
+                                pointHoverBackgroundColor: isDarkMode ? getCssVariable('--color-card-bg') : '#fff',
+                                pointHoverBorderColor: chartBorderColor
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            scales: {
+                                r: {
+                                    angleLines: {
+                                        display: true,
+                                        color: chartGridColor // Color for lines from center to point labels
+                                    },
+                                    suggestedMin: 0,
+                                    suggestedMax: 100,
+                                    ticks: {
+                                        stepSize: 20,
+                                        backdropColor: isDarkMode ? 'rgba(44, 44, 44, 0.75)' : 'rgba(255, 255, 255, 0.75)',
+                                        color: chartTextMutedColor, // Tick label color (0, 20, 40...)
+                                        font: {
+                                            size: 10 // Smaller font for ticks
+                                        }
+                                    },
+                                    pointLabels: { // Labels around the radar (Joy, Sadness etc.)
+                                        font: {
+                                            size: 12
+                                        },
+                                        color: chartPointLabelColor
+                                    },
+                                    grid: {
+                                        color: chartGridColor // Circular grid lines
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        color: chartTextMutedColor // Legend text color
+                                    }
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                    backgroundColor: isDarkMode ? getCssVariable('--color-card-bg') : '#fff',
+                                    titleColor: chartPointLabelColor,
+                                    bodyColor: chartPointLabelColor,
+                                    borderColor: chartBorderColor,
+                                    borderWidth: 1,
+                                    callbacks: {
+                                        label: function (context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.r !== null) {
+                                                label += context.parsed.r.toFixed(1) + '%';
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Initial chart creation
+                createOrUpdateRadarChart();
+
+                // Listen for changes in color scheme preference
+                if (window.matchMedia) {
+                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', createOrUpdateRadarChart);
+                }
+            });
+        </script>
+    {% endif %}
 {% endblock %}
