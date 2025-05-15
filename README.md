@@ -110,7 +110,29 @@ Open http://localhost:5001 in your browser
 
 ## Test Instructions
 
-(To be added after development begins.)
+Unit Tests
+
+The project includes Python unit tests to verify authentication, diary creation, editing, deletion, sharing, and access control. These tests are located in tests/test_app.py and use pytest with the pytest-flask plugin.
+
+Prerequisites and Running Unit Tests:
+
+1. Complete the Setup Instructions above (clone repository, activate virtual environment, install dependencies, prepare database).
+
+2. Ensure pytest, pytest-flask, and pytest-cov are installed (included in requirements.txt).
+
+3. Run the unit tests: pytest tests/test_app.py
+
+4. Run tests with coverage report: pytest --cov=app tests/test_app.py
+
+Notes:
+
+Tests use an in-memory SQLite database (sqlite:///:memory:) to avoid modifying instance/app.db.
+
+If tests fail, check the Troubleshooting section for dependency or database issues.
+
+Warnings can be suppressed by adding to pytest.ini
+
+
 
 ## Troubleshooting
 
