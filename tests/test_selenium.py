@@ -4,6 +4,7 @@ import socket
 import subprocess
 import time
 import unittest
+import sys
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -37,7 +38,7 @@ class MoodDiaryUITest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # 1. стартуем Flask
-        cls.server = subprocess.Popen(["python", "run.py"])
+        cls.server = subprocess.Popen([sys.executable, "run.py"])
         wait_port("127.0.0.1", PORT)
 
         # 2. инициализируем Chrome (headless)
