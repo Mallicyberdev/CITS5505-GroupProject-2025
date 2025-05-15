@@ -21,7 +21,7 @@ def home():
         .order_by(DiaryEntry.created_at.desc())
         .all()
     )
-    return render_template("home.html", diaries=diaries)
+    return render_template("dashboard/home.html", diaries=diaries)
 
 
 @bp.route("/shared")

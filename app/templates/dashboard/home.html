@@ -9,27 +9,26 @@
         <!-- Seach and Filter Row -->
         <div class="search-filter-row my-4">
             <!-- Search -->
-            <input type="text"
-                   id="searchInput"
-                   class="form-control"
-                   placeholder="Search diaries...">
+            <label for="searchInput">
+                <input type="text"
+                       id="searchInput"
+                       class="form-control"
+                       placeholder="Search diaries...">
+            </label>
 
             <!-- Filter -->
-            <select id="emotionFilter" class="form-select">
-                <option value="">All Emotions</option>
-                <option value="joy">Joy</option>
-                <option value="surprise">Surprise</option>
-                <option value="neutral">Neutral</option>
-                <option value="sadness">Sadness</option>
-                <option value="fear">Fear</option>
-                <option value="anger">Anger</option>
-                <option value="disgust">Disgust</option>
-            </select>
-        </div>
-
-
-        <!-- Diary Cards -->
-        <div class="text-center mb-3">
+            <label for="emotionFilter">
+                <select id="emotionFilter" class="form-select">
+                    <option value="">All Emotions</option>
+                    <option value="joy">Joy</option>
+                    <option value="surprise">Surprise</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="sadness">Sadness</option>
+                    <option value="fear">Fear</option>
+                    <option value="anger">Anger</option>
+                    <option value="disgust">Disgust</option>
+                </select>
+            </label>
         </div>
 
         {% if diaries %}
@@ -41,50 +40,42 @@
 
 
                                 <h5 class="card-title">{{ diary.title }}</h5>
-                                <p class="card-text text-muted small">
-                                    Owner: {{ diary.owner.username }}
-                                    {% if diary.owner_id != current_user.id %}
-                                        (Shared)
-                                    {% endif %}
-                                </p>
+
                                 <p class="card-text flex-grow-1 diary-content">
                                     {{ diary.content[:150] }}{% if diary.content|length > 150 %}...{% endif %}</p>
 
                                 {% if diary.analyzed and diary.dominant_emotion_label %}
                                     <p class="card-text mb-2">
-                        <span class="badge rounded-pill
-                                    {% if diary.dominant_emotion_label == 'joy' or diary.dominant_emotion_label == 'love' %} bg-success
-                                    {% elif diary.dominant_emotion_label == 'sadness' or diary.dominant_emotion_label == 'fear' %} bg-info text-dark
-                                    {% elif diary.dominant_emotion_label == 'anger' %} bg-danger
-                                    {% elif diary.dominant_emotion_label == 'surprise' %} bg-warning text-dark
-                                    {% else %} bg-secondary
-                                    {% endif %} emotion-badge">
-                            Emotion: {{ diary.dominant_emotion_label }} ({{ "%.0f"|format(diary.dominant_emotion_score *
-                            100) }}%)
-                        </span>
+                                        <span class="badge rounded-pill
+                                            {% if diary.dominant_emotion_label == 'joy' or diary.dominant_emotion_label == 'love' %} bg-success
+                                            {% elif diary.dominant_emotion_label == 'sadness' or diary.dominant_emotion_label == 'fear' %} bg-info text-dark
+                                            {% elif diary.dominant_emotion_label == 'anger' %} bg-danger
+                                            {% elif diary.dominant_emotion_label == 'surprise' %} bg-warning text-dark
+                                            {% else %} bg-secondary
+                                            {% endif %} emotion-badge">
+                                                Emotion: {{ diary.dominant_emotion_label }} ({{ "%.0f"|format(diary.dominant_emotion_score * 100) }}%)
+                                        </span>
                                     </p>
                                 {% elif diary.analyzed %}
-                                    <p class="card-text mb-2"><span
-                                            class="badge rounded-pill bg-light text-dark emotion-badge">Emotion:
-                            Not Detected</span>
+                                    <p class="card-text mb-2">
+                                        <span class="badge rounded-pill bg-light text-dark emotion-badge">Emotion: Not Detected</span>
                                     </p>
                                 {% else %}
-                                    <p class="card-text mb-2"><span
-                                            class="badge rounded-pill bg-light text-dark emotion-badge">Emotion:
-                            Not Analyzed</span>
+                                    <p class="card-text mb-2">
+                                        <span class="badge rounded-pill bg-light text-dark emotion-badge">Emotion: Not Analyzed</span>
                                     </p>
                                 {% endif %}
 
-                                <p class="card-text mt-auto"><small
-                                        class="text-muted">Created: {{ diary.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                <p class="card-text mt-auto">
+                                    <small class="text-muted">Created: {{ diary.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
                                 </p>
 
                                 <div class="mt-2">
                                     <a href="{{ url_for('data_handling.view_diary', diary_id=diary.id) }}"
-                                       class="btn btn-sm btn-outline-secondary me-1">View Details</a>
+                                       class="btn btn-sm btn-primary">View Details</a>
                                     {% if diary.owner_id == current_user.id %}
                                         <a href="{{ url_for('data_handling.edit_diary', diary_id=diary.id) }}"
-                                           class="btn btn-sm btn-primary">Edit</a>
+                                           class="btn btn-sm btn-outline-secondary me-1">Edit</a>
                                     {% endif %}
                                 </div>
                             </div>
