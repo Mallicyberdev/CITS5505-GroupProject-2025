@@ -161,6 +161,27 @@ If tests fail, check the Troubleshooting section for dependency or database issu
 
 Warnings can be suppressed by adding to pytest.ini
 
+Prerequisites and End-to-End (Selenium) Tests
+
+The repository contains a small but representative set of Selenium-driven
+end-to-end tests (`tests/test_selenium.py`).  
+These checks verify that a real browser can:
+
+1. Open the public landing page;
+2. Complete the full log-in / log-out sequence;
+3. Create a new diary entry and see the corresponding card on the dashboard.
+
+
+* **Chrome** (or Chromium) must be installed on the host machine.  
+  The correct driver is downloaded automatically by *webdriver-manager*.
+* A user with credentials  
+  - **username:** `testuser`  
+  - **password:** `123456`  
+  must already exist in the application database.  
+  Create the record manually or through a fixture before executing the suite.
+
+Running the E2E tests: python -m unittest tests/test_selenium.py -v 
+
 ## Troubleshooting
 
 Permission is denied when creating .venv
@@ -185,5 +206,4 @@ flask db upgrade
 ```
 
 App runs, but nothing happens at <localhost:5001>
-Ensure the app has fully started without exceptions. Try visiting http://127.0.0.1:5001 instead. If you're in VSCode,
-check if the debugger is holding the port.
+Ensure the app has fully started without exceptions. Try visiting http://127.0.0.1:5001 instead. If you're in VSCode, check if the debugger is holding the port.

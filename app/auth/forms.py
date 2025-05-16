@@ -1,4 +1,15 @@
 # app/auth/forms.py
+"""
+Form definitions for user authentication.
+
+This module contains WTForms form classes for login, registration,
+and other authentication-related functionality.
+
+Classes:
+    LoginForm: Handles user login form data and validation
+    RegistrationForm: Handles new user registration form data and validation
+"""
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
@@ -28,13 +39,13 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField("Register")
 
     def validate_username(self, username):
-        """Check if the username is already taken in the database."""
+        """Validate username uniqueness."""
         user = db.session.scalar(select(User).filter_by(username=username.data))
         if user is not None:
             raise ValidationError("Please use a different username.")
 
     def validate_email(self, email):
-        """Check if the email address is already registered in the database."""
+        """Validate email uniqueness."""
         user = db.session.scalar(select(User).filter_by(email=email.data))
         if user is not None:
             raise ValidationError("Please use a different email address.")
