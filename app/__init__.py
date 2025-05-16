@@ -7,6 +7,7 @@ configures the database, and mounts blueprints.
 
 import os
 from flask import Flask
+from flask_wtf import CSRFProtect
 from .extensions import db, migrate, login_manager
 from config import Config
 
@@ -38,6 +39,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    csrf = CSRFProtect(app)
 
     # Create database tables if they don't exist (since not using Migrate)
     with app.app_context():

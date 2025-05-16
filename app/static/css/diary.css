@@ -133,3 +133,16 @@ form textarea.form-control:focus {
     width: 180px;
     max-width: 180px;
 }
+
+.emotion-badge-btn {
+    /* Add any custom styles here if needed */
+    /* For example, to make it slightly more compact like a badge: */
+    padding: 0.25em 0.6em;
+    font-size: 0.85em; /* Adjust as needed */
+    text-decoration: none; /* Ensure no underline from <a> tag if not desired */
+}
+
+.emotion-badge-btn:hover {
+    text-decoration: none; /* Ensure no underline on hover */
+    /* Add custom hover effects if Bootstrap defaults aren't enough */
+}

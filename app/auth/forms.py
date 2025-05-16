@@ -1,3 +1,4 @@
+# app/auth/forms.py
 """
 Form definitions for user authentication.
 

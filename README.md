@@ -206,5 +206,4 @@ flask db upgrade
 ```
 
 App runs, but nothing happens at <localhost:5001>
-Ensure the app has fully started without exceptions. Try visiting http://127.0.0.1:5001 instead. If you're in VSCode,
-check if the debugger is holding the port.
+Ensure the app has fully started without exceptions. Try visiting http://127.0.0.1:5001 instead. If you're in VSCode, check if the debugger is holding the port.

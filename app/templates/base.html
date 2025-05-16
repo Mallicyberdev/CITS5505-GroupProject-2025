@@ -32,7 +32,7 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
+            <a class="navbar-brand fw-bold" href="{{ url_for('main.home') }}">
                 MoodDiary
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
@@ -77,6 +77,29 @@
 
 <main class="flex-fill pt-6">
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const flashes = JSON.parse('{{ messages | tojson | safe }}');
+                    flashes.forEach(([category, message]) => {
+                        let icon = 'info';
+                        if (category === 'success') icon = 'success';
+                        else if (category === 'danger') icon = 'error';
+                        else if (category === 'warning') icon = 'warning';
+
+                        Swal.fire({
+                            icon: icon,
+                            title: message,
+                            timer: 2500,
+                            showConfirmButton: false
+                        });
+                    });
+                });
+            </script>
+        {% endif %}
+    {% endwith %}
+
     {% block content %}{% endblock %}
 
 </main>
@@ -95,28 +118,6 @@
             integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
             crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const flashes = {{ messages | tojson }};
-                    flashes.forEach(([category, message]) => {
-                        let icon = 'info';
-                        if (category === 'success') icon = 'success';
-                        else if (category === 'danger') icon = 'error';
-                        else if (category === 'warning') icon = 'warning';
-
-                        Swal.fire({
-                            icon: icon,
-                            title: message,
-                            timer: 2500,
-                            showConfirmButton: false
-                        });
-                    });
-                });
-            </script>
-        {% endif %}
-    {% endwith %}
 {% endblock %}
 
 </body>

@@ -28,11 +28,11 @@ emotion_classifier = pipeline(
 @login_required
 def create_diary():
     """Create a new diary entry.
-    
+
     Returns:
         GET: Render diary creation form
         POST: Redirect to home page after creating entry
-        
+
     Requires:
         User authentication
     """
@@ -183,7 +183,10 @@ def share_diary(diary_id):
 
         if success_count > 0:
             db.session.commit()
-            flash(f"Diary sharing updated (changes applied to {success_count} user(s)).", "success")
+            flash(
+                f"Diary sharing updated successfully! {success_count} changes made.",
+                "success",
+            )
         else:
             flash("No changes made to sharing settings.", "info")
     except Exception as e:
@@ -191,13 +194,6 @@ def share_diary(diary_id):
         flash(f"Failed to update diary sharing: {str(e)}", "danger")
 
     return redirect(url_for("data_handling.view_diary", diary_id=diary_id))
-
-
-@bp.route("/list_users", methods=["GET"])
-@login_required
-def list_users():
-    users = User.query.all()
-    return jsonify([{"id": user.id, "username": user.username} for user in users])
 
 
 @bp.route("/get_shared_users/<int:diary_id>", methods=["GET"])
@@ -208,4 +204,6 @@ def get_shared_users(diary_id):
         flash("You can only view shared users for diaries you own.", "danger")
         return jsonify([]), 403
     shared_users = diary_entry.get_shared_users()
-    return jsonify([{"id": user.id, "username": user.username} for user in shared_users])
+    return jsonify(
+        [{"id": user.id, "username": user.username} for user in shared_users]
+    )
