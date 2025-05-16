@@ -270,7 +270,7 @@ class DiaryTests(BaseTestCase):
             }, follow_redirects=True)
             self.assertEqual(response.status_code, 200)
             messages = get_flashed_messages()
-            self.assertIn('Diary sharing updated (changes applied to 1 user(s)).', messages)
+            self.assertIn('Diary sharing updated successfully! 1 changes made.', messages)
 
             # Verify sharing
             self.assertTrue(diary.is_shared_with_user(user2))
