@@ -5,63 +5,84 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <!-- Seach and Filter Row -->
-        <div class="search-filter-row my-4">
-            <!-- Search -->
-            <label for="searchInput"></label>
-            <input type="text"
-                   id="searchInput"
-                   class="form-control"
-                   placeholder="Search diaries...">
+    <div class="container pt-md-5 pb-5">
 
-            <!-- Filter -->
-            <label for="emotionFilter" class="form-label visually-hidden">Filter by Emotion</label>
-            <select id="emotionFilter" class="form-select">
-                <option value="">All Emotions</option>
-                {# Dynamically set the 'selected' attribute based on current_emotion_filter from backend #}
-                <option value="joy" {% if current_emotion_filter == 'joy' %}selected{% endif %}>Joy</option>
-                <option value="surprise" {% if current_emotion_filter == 'surprise' %}selected{% endif %}>Surprise
-                </option>
-                <option value="neutral" {% if current_emotion_filter == 'neutral' %}selected{% endif %}>Neutral</option>
-                {# You might not have 'neutral' as a dominant emotion #}
-                <option value="sadness" {% if current_emotion_filter == 'sadness' %}selected{% endif %}>Sadness</option>
-                <option value="fear" {% if current_emotion_filter == 'fear' %}selected{% endif %}>Fear</option>
-                <option value="anger" {% if current_emotion_filter == 'anger' %}selected{% endif %}>Anger</option>
-                <option value="disgust" {% if current_emotion_filter == 'disgust' %}selected{% endif %}>Disgust</option>
-            </select>
-        </div>
-
-        <div class="container py-4">
-            <!-- Average Mood Index card -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Average Mood Index (last 7 days)</h5>
-                    <p class="display-4 mb-0" id="avgMoodIndex">--</p>
-                    <small id="avgMoodDateRange" class="text-muted"></small>
-                </div>
+        <!-- Search and Filter Row -->
+        <div class="row g-3 align-items-center mb-4 search-filter-row">
+            <div class="col-md">
+                {# Visually hidden label for accessibility, placeholder acts as visual label #}
+                <label for="searchInput" class="visually-hidden">Search Diaries</label>
+                <input type="text"
+                       id="searchInput"
+                       class="form-control form-control-lg" {# Made larger for better prominence #}
+                       placeholder="Search diaries by title or content...">
             </div>
-
-            <!-- Mood Timeline chart -->
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Mood Timeline</h5>
-                    <canvas id="moodTimelineChart" height="120"></canvas>
-                </div>
+            <div class="col-md-auto"> {# col-md-auto will make this column only as wide as its content #}
+                <label for="emotionFilter" class="visually-hidden">Filter by Emotion</label>
+                <select id="emotionFilter" class="form-select form-select-lg"> {# Made larger #}
+                    <option value="">All Emotions</option>
+                    {# Dynamically set the 'selected' attribute based on current_emotion_filter from backend #}
+                    <option value="joy" {% if current_emotion_filter == 'joy' %}selected{% endif %}>Joy</option>
+                    <option value="surprise" {% if current_emotion_filter == 'surprise' %}selected{% endif %}>Surprise
+                    </option>
+                    <option value="neutral" {% if current_emotion_filter == 'neutral' %}selected{% endif %}>Neutral
+                    </option>
+                    <option value="sadness" {% if current_emotion_filter == 'sadness' %}selected{% endif %}>Sadness
+                    </option>
+                    <option value="fear" {% if current_emotion_filter == 'fear' %}selected{% endif %}>Fear</option>
+                    <option value="anger" {% if current_emotion_filter == 'anger' %}selected{% endif %}>Anger</option>
+                    <option value="disgust" {% if current_emotion_filter == 'disgust' %}selected{% endif %}>Disgust
+                    </option>
+                    {# Add more emotions as needed #}
+                </select>
             </div>
         </div>
 
+        <!-- Dashboard Stats and Timeline -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm chart-container">
+                    <div class="card-body text-center d-flex flex-column">
+                        <h5 class="card-title text-muted mb-2">Average Mood Index</h5>
+                        <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                            <p class="display-3 fw-bold mb-1" id="avgMoodIndex">--</p>
+                            <small id="avgMoodDateRange" class="text-muted d-block">(last 7 days)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card h-100 shadow-sm chart-container">
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-muted">Mood Timeline</h5> {# text-muted for consistency #}
+                        <div class="" style="position: relative; height:250px;">
+                            {# Wrapper for responsive chart #}
+                            <canvas id="moodTimelineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diaries Grid -->
         {% if diaries %}
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="diariesGrid">
                 {% for diary in diaries %}
-                    <div class="col">
-                        <div class="card h-100 diary-card shadow-sm">
+                    <div class="col diary-item"> {# Added diary-item class for easier selection #}
+                        <div class="card h-100 diary-card shadow-sm"> {# Ensured shadow-sm #}
                             <div class="card-body d-flex flex-column">
+                                <h5 class="card-title mb-2">
+                                    <a href="{{ url_for('data_handling.view_diary', diary_id=diary.id) }}"
+                                       class="text-decoration-none stretched-link">{{ diary.title }}</a>
+                                </h5>
 
-                                <h5 class="card-title">{{ diary.title }}</h5>
-
-                                <p class="card-text flex-grow-1 diary-content">
-                                    {{ diary.content[:150] }}{% if diary.content|length > 150 %}...{% endif %}</p>
+                                {# Using a div for content to better control potential overflow and apply CSS like white-space if needed #}
+                                <div class="card-text flex-grow-1 diary-content-preview mb-2">
+                                    {# Backend should handle stripping HTML for preview if content can be HTML #}
+                                    {# Forcing plain text display and handling newlines for preview if desired #}
+                                    {{ diary.content[:150]|striptags|replace('\n', ' ') }}
+                                    {% if diary.content|length > 150 %}...{% endif %}
+                                </div>
 
                                 {% if diary.analyzed and diary.dominant_emotion_label %}
                                     <p class="card-text mb-2">
@@ -72,54 +93,65 @@
                                             {% elif diary.dominant_emotion_label == 'surprise' %} bg-warning text-dark
                                             {% else %} bg-secondary
                                             {% endif %} emotion-badge">
-                                                Emotion: {{ diary.dominant_emotion_label }} ({{ "%.0f"|format(diary.dominant_emotion_score * 100) }}%)
+                                            <!-- Using an icon for better visual cue -->
+                                            <i class="bi bi-emoji-smile-fill me-1"></i> {{ diary.dominant_emotion_label|capitalize }}
+                                            ({{ "%.0f"|format(diary.dominant_emotion_score * 100) }}%)
                                         </span>
                                     </p>
                                 {% elif diary.analyzed %}
                                     <p class="card-text mb-2">
-                                        <span class="badge rounded-pill bg-light text-dark emotion-badge">Emotion: Not Detected</span>
+                                        <span class="badge rounded-pill bg-light text-dark emotion-badge"><i
+                                                class="bi bi-emoji-neutral-fill me-1"></i>Not Detected</span>
                                     </p>
                                 {% else %}
                                     <p class="card-text mb-2">
-                                        <span class="badge rounded-pill bg-light text-dark emotion-badge">Emotion: Not Analyzed</span>
+                                        <span class="badge rounded-pill bg-light text-dark emotion-badge"><i
+                                                class="bi bi-question-circle-fill me-1"></i>Not Analyzed</span>
                                     </p>
                                 {% endif %}
 
-                                <p class="card-text mt-auto">
-                                    <small class="text-muted">Created: {{ diary.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                <p class="card-text mt-auto mb-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar3 me-1"></i>{{ diary.created_at.strftime('%b %d, %Y') }}
+                                        {# Shorter date format #}
+                                    </small>
                                 </p>
 
-                                <div class="mt-2">
-                                    <a href="{{ url_for('data_handling.view_diary', diary_id=diary.id) }}"
-                                       class="btn btn-sm btn-primary">View Details</a>
-                                    {% if diary.owner_id == current_user.id %}
+                                {# Action buttons - Stretched link on title makes the whole card clickable to view #}
+                                {% if diary.owner_id == current_user.id %}
+                                    <div class="mt-2 text-end diary-actions" style="position: relative; z-index: 2;">
                                         <a href="{{ url_for('data_handling.edit_diary', diary_id=diary.id) }}"
-                                           class="btn btn-sm btn-outline-secondary me-1">Edit</a>
-                                    {% endif %}
-                                </div>
+                                           class="btn btn-sm btn-outline-secondary py-1 px-2">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
 
-            <div id="noResultsMessage" class="text-center mt-4" style="display: none;">
-                <p class="text-muted">No diaries match your search or selected emotion.</p>
+            <div id="noResultsMessage" class="text-center mt-5 py-5" style="display: none;">
+                <i class="bi bi-search display-4 text-muted mb-3"></i>
+                <p class="lead text-muted">No diaries match your search or filter.</p>
             </div>
         {% else %}
-            <div class="text-center mt-5">
+            <div class="text-center mt-5 py-5">
+                <i class="bi bi-journal-richtext display-1 text-muted mb-3"></i>
                 <p class="lead">No diaries found yet.</p>
-                <p>Why not start by creating your first one?</p>
-                <a href="{{ url_for('data_handling.create_diary') }}" class="btn btn-lg btn-success">
-                    <i class="bi bi-journal-plus"></i> Create New Diary
+                <p class="text-muted">Why not start by creating your first one?</p>
+                <a href="{{ url_for('data_handling.create_diary') }}" class="btn btn-lg btn-primary mt-3">
+                    <i class="bi bi-journal-plus me-2"></i> Create New Diary
                 </a>
             </div>
         {% endif %}
     </div>
 
+    <!-- Floating Action Button for Create New Diary -->
     {% if current_user.is_authenticated %}
         <div class="fab-container">
-            <a href="{{ url_for('data_handling.create_diary') }}" class="btn btn-success shadow fab-btn fab-btn-lg"
+            <a href="{{ url_for('data_handling.create_diary') }}" class="btn btn-primary shadow-lg fab-btn fab-btn-lg"
                title="Create New Diary">
                 <i class="bi bi-plus-lg"></i>
             </a>
@@ -130,99 +162,175 @@
 {% block scripts %}
     {{ super() }}
     <script>
-        function normalize(text) {
+        // Helper function to normalize text for searching (lowercase and trim)
+        function normalizeSearchText(text) {
             return text.toLowerCase().trim();
         }
 
-        function filterDiaries() {
-            const query = normalize(document.getElementById("searchInput").value);
+        // Function to filter diary cards based on search input
+        function filterDiariesBySearch() {
+            const searchQuery = normalizeSearchText(document.getElementById("searchInput").value);
+            const diaryItems = document.querySelectorAll("#diariesGrid .diary-item"); // Select the .col elements
+            const noResultsMsgElement = document.getElementById("noResultsMessage");
+            let visibleCount = 0;
 
-            const cards = document.querySelectorAll(".diary-card");
+            diaryItems.forEach(item => {
+                const card = item.querySelector(".diary-card");
+                const title = normalizeSearchText(card.querySelector(".card-title a").textContent); // Get text from link inside title
+                const contentPreview = normalizeSearchText(card.querySelector(".diary-content-preview").textContent);
 
-            let matchCount = 0;
+                // Check if search query is found in title or content
+                const isMatch = title.includes(searchQuery) || contentPreview.includes(searchQuery);
+                item.style.display = isMatch ? "" : "none"; // Show or hide the .col parent
 
-            cards.forEach(card => {
-                const title = normalize(card.querySelector(".card-title").textContent);
-                const content = normalize(card.querySelector(".diary-content").textContent);
-
-                const isVisible = title.includes(query) || content.includes(query);
-                card.closest(".col").style.display = isVisible ? "" : "none";
-
-                if (isVisible) matchCount++;
+                if (isMatch) {
+                    visibleCount++;
+                }
             });
 
-            const noResultMsg = document.getElementById("noResultsMessage");
-            if (noResultMsg) {
-                noResultMsg.style.display = matchCount === 0 ? "block" : "none";
+            // Show or hide the "no results" message
+            if (noResultsMsgElement) {
+                noResultsMsgElement.style.display = visibleCount === 0 && diaryItems.length > 0 ? "block" : "none";
             }
         }
 
-        document.getElementById("searchInput").addEventListener("input", filterDiaries);
-    </script>
-    <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const emotionFilterSelect = document.getElementById("emotionFilter");
+            const searchInputElement = document.getElementById("searchInput");
+            if (searchInputElement) {
+                searchInputElement.addEventListener("input", filterDiariesBySearch);
+            }
 
-            if (emotionFilterSelect) {
-                emotionFilterSelect.addEventListener("change", function () {
+            const emotionFilterSelectElement = document.getElementById("emotionFilter");
+            if (emotionFilterSelectElement) {
+                emotionFilterSelectElement.addEventListener("change", function () {
                     const selectedEmotion = this.value;
                     const currentUrl = new URL(window.location.href);
 
                     if (selectedEmotion) {
                         currentUrl.searchParams.set("emotion_tag", selectedEmotion);
                     } else {
+                        // If "All Emotions" is selected, remove the filter parameter
                         currentUrl.searchParams.delete("emotion_tag");
                     }
-
+                    // Redirect to the new URL with or without the emotion_tag parameter
                     window.location.href = currentUrl.toString();
                 });
             }
+
+            // Initialize Charts
+            initializeDashboardCharts();
         });
-    </script>
-    <script>
-        (async () => {
-            /* -------- Fetch mood-timeline data -------- */
-            const timelineResp = await fetch("{{ url_for('data_handling.mood_timeline') }}?days=30");
-            const timelineRows = await timelineResp.json();
 
-            // Build arrays required by Chart.js
-            const dates = [...new Set(timelineRows.map(r => r.date))].sort();
-            const emotions = [...new Set(timelineRows.map(r => r.emotion))];
 
-            const datasets = emotions.map(emotion => {
-                const counts = dates.map(d =>
-                    (timelineRows.find(r => r.date === d && r.emotion === emotion) || {}).count || 0
-                );
-                return {
-                    label: emotion,
-                    data: counts,
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: false
-                };
-            });
+        // Function to get CSS variable values for chart styling
+        function getCssVariableValue(variableName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+        }
 
-            new Chart(
-                document.getElementById("moodTimelineChart").getContext("2d"),
-                {
-                    type: "line",
-                    data: {labels: dates, datasets},
-                    options: {
-                        responsive: true,
-                        scales: {y: {beginAtZero: true, ticks: {precision: 0}}}
-                    }
+        // Asynchronous function to fetch data and initialize dashboard charts
+        async function initializeDashboardCharts() {
+            try {
+                // -------- Fetch and render Mood Timeline chart --------
+                const timelineChartCanvas = document.getElementById("moodTimelineChart");
+                if (timelineChartCanvas) {
+                    const timelineResponse = await fetch("{{ url_for('data_handling.mood_timeline') }}?days=30");
+                    if (!timelineResponse.ok) throw new Error(`HTTP error! status: ${timelineResponse.status}`);
+                    const timelineRows = await timelineResponse.json();
+
+                    const dates = [...new Set(timelineRows.map(r => r.date))].sort();
+                    const uniqueEmotions = [...new Set(timelineRows.map(r => r.emotion))];
+
+                    // Define a color palette for emotions, can be expanded
+                    const emotionColors = {
+                        'joy': getCssVariableValue('--bs-success') || 'rgba(40, 167, 69, 0.7)',
+                        'sadness': getCssVariableValue('--bs-info') || 'rgba(23, 162, 184, 0.7)',
+                        'anger': getCssVariableValue('--bs-danger') || 'rgba(220, 53, 69, 0.7)',
+                        'fear': getCssVariableValue('--bs-primary') || 'rgba(108, 52, 131, 0.7)', // Using your primary purple
+                        'surprise': getCssVariableValue('--bs-warning') || 'rgba(255, 193, 7, 0.7)',
+                        'neutral': getCssVariableValue('--bs-secondary') || 'rgba(108, 117, 125, 0.7)',
+                        // Add more emotion-color mappings here
+                    };
+                    const defaultColor = getCssVariableValue('--bs-gray') || 'rgba(170, 170, 170, 0.7)';
+
+
+                    const datasets = uniqueEmotions.map(emotion => {
+                        const counts = dates.map(d =>
+                            (timelineRows.find(r => r.date === d && r.emotion === emotion) || {}).count || 0
+                        );
+                        const color = emotionColors[emotion.toLowerCase()] || defaultColor;
+                        return {
+                            label: emotion.charAt(0).toUpperCase() + emotion.slice(1), // Capitalize
+                            data: counts,
+                            borderColor: color,
+                            backgroundColor: color.replace('0.7', '0.2'), // Lighter fill
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: false,
+                            pointRadius: 3,
+                            pointBackgroundColor: color
+                        };
+                    });
+
+                    const textColor = getCssVariableValue('--color-text'); // From your root variables
+                    const gridColor = getCssVariableValue('--color-border'); // From your root variables
+
+                    new Chart(
+                        timelineChartCanvas.getContext("2d"),
+                        {
+                            type: "line",
+                            data: {labels: dates, datasets: datasets},
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false, // Important for chart container
+                                interaction: { // For better tooltips
+                                    mode: 'index',
+                                    intersect: false,
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {precision: 0, color: textColor},
+                                        grid: {color: gridColor}
+                                    },
+                                    x: {
+                                        ticks: {color: textColor},
+                                        grid: {color: gridColor}
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                        labels: {color: textColor}
+                                    },
+                                    tooltip: {
+                                        backgroundColor: getCssVariableValue('--color-card-bg'),
+                                        titleColor: textColor,
+                                        bodyColor: textColor,
+                                        borderColor: gridColor,
+                                        borderWidth: 1
+                                    }
+                                }
+                            }
+                        }
+                    );
                 }
-            );
 
-            /* -------- Fetch average-mood-index data -------- */
-            const idxResp = await fetch("{{ url_for('data_handling.average_mood_index') }}");
-            const idxJson = await idxResp.json();
+                // -------- Fetch and update Average Mood Index --------
+                const avgMoodIndexElement = document.getElementById("avgMoodIndex");
+                if (avgMoodIndexElement) {
+                    const idxResponse = await fetch("{{ url_for('data_handling.average_mood_index') }}");
+                    if (!idxResponse.ok) throw new Error(`HTTP error! status: ${idxResponse.status}`);
+                    const idxJson = await idxResponse.json();
 
-            document.getElementById("avgMoodIndex").textContent = idxJson.average_mood_index;
-            document.getElementById("avgMoodDateRange").textContent =
-                `${idxJson.start} – ${idxJson.end}`;
-        })();
+                    avgMoodIndexElement.textContent = parseFloat(idxJson.average_mood_index).toFixed(1) || '--';
+                    document.getElementById("avgMoodDateRange").textContent =
+                        `(${idxJson.start} – ${idxJson.end})`;
+                }
+
+            } catch (error) {
+                console.error("Error initializing dashboard charts or data:", error);
+                // Optionally, display a user-friendly error message on the page
+            }
+        }
     </script>
-
 {% endblock %}
-
