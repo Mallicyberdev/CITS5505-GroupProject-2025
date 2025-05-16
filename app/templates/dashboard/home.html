@@ -36,6 +36,27 @@
                     {# Add more emotions as needed #}
                 </select>
             </div>
+            <div class="col-md-auto">
+                <label for="sortDiaries" class="visually-hidden">Sort Diaries</label>
+                <select id="sortDiaries" class="form-select form-select-lg">
+                    <option value="created_desc" {% if current_sort_by == 'created_desc' %}selected{% endif %}>Date
+                        (Newest First)
+                    </option>
+                    <option value="created_asc" {% if current_sort_by == 'created_asc' %}selected{% endif %}>Date
+                        (Oldest First)
+                    </option>
+                    <option value="title_asc" {% if current_sort_by == 'title_asc' %}selected{% endif %}>Title (A-Z)
+                    </option>
+                    <option value="title_desc" {% if current_sort_by == 'title_desc' %}selected{% endif %}>Title (Z-A)
+                    </option>
+                    <option value="mood_asc" {% if current_sort_by == 'mood_asc' %}selected{% endif %}>Mood Score
+                        (Lowest First)
+                    </option>
+                    <option value="mood_desc" {% if current_sort_by == 'mood_desc' %}selected{% endif %}>Mood Score
+                        (Highest First)
+                    </option>
+                </select>
+            </div>
         </div>
 
         <!-- Dashboard Stats and Timeline -->
@@ -196,6 +217,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const searchInputElement = document.getElementById("searchInput");
+
             if (searchInputElement) {
                 searchInputElement.addEventListener("input", filterDiariesBySearch);
             }
@@ -205,17 +227,35 @@
                 emotionFilterSelectElement.addEventListener("change", function () {
                     const selectedEmotion = this.value;
                     const currentUrl = new URL(window.location.href);
-
                     if (selectedEmotion) {
                         currentUrl.searchParams.set("emotion_tag", selectedEmotion);
                     } else {
-                        // If "All Emotions" is selected, remove the filter parameter
                         currentUrl.searchParams.delete("emotion_tag");
                     }
-                    // Redirect to the new URL with or without the emotion_tag parameter
+                    // Reset page to 1 when filter changes
+                    currentUrl.searchParams.delete("page");
                     window.location.href = currentUrl.toString();
                 });
             }
+
+            // START: JavaScript for Sort By Dropdown
+            const sortDiariesSelectElement = document.getElementById("sortDiaries");
+            if (sortDiariesSelectElement) {
+                sortDiariesSelectElement.addEventListener("change", function () {
+                    const selectedSort = this.value;
+                    const currentUrl = new URL(window.location.href);
+                    if (selectedSort) {
+                        currentUrl.searchParams.set("sort_by", selectedSort);
+                    } else {
+                        // Default sort if nothing selected (though one should always be)
+                        currentUrl.searchParams.delete("sort_by");
+                    }
+                    // Reset page to 1 when sort changes
+                    currentUrl.searchParams.delete("page");
+                    window.location.href = currentUrl.toString();
+                });
+            }
+            // END: JavaScript for Sort By Dropdown
 
             // Initialize Charts
             initializeDashboardCharts();
