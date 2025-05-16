@@ -9,27 +9,27 @@
         <!-- Seach and Filter Row -->
         <div class="search-filter-row my-4">
             <!-- Search -->
+            <label for="searchInput"></label>
             <input type="text"
                    id="searchInput"
                    class="form-control"
                    placeholder="Search diaries...">
 
             <!-- Filter -->
+            <label for="emotionFilter" class="form-label visually-hidden">Filter by Emotion</label>
             <select id="emotionFilter" class="form-select">
                 <option value="">All Emotions</option>
-                <option value="joy">Joy</option>
-                <option value="surprise">Surprise</option>
-                <option value="neutral">Neutral</option>
-                <option value="sadness">Sadness</option>
-                <option value="fear">Fear</option>
-                <option value="anger">Anger</option>
-                <option value="disgust">Disgust</option>
+                {# Dynamically set the 'selected' attribute based on current_emotion_filter from backend #}
+                <option value="joy" {% if current_emotion_filter == 'joy' %}selected{% endif %}>Joy</option>
+                <option value="surprise" {% if current_emotion_filter == 'surprise' %}selected{% endif %}>Surprise
+                </option>
+                <option value="neutral" {% if current_emotion_filter == 'neutral' %}selected{% endif %}>Neutral</option>
+                {# You might not have 'neutral' as a dominant emotion #}
+                <option value="sadness" {% if current_emotion_filter == 'sadness' %}selected{% endif %}>Sadness</option>
+                <option value="fear" {% if current_emotion_filter == 'fear' %}selected{% endif %}>Fear</option>
+                <option value="anger" {% if current_emotion_filter == 'anger' %}selected{% endif %}>Anger</option>
+                <option value="disgust" {% if current_emotion_filter == 'disgust' %}selected{% endif %}>Disgust</option>
             </select>
-        </div>
-
-
-        <!-- Diary Cards -->
-        <div class="text-center mb-3">
         </div>
 
         {% if diaries %}
@@ -39,52 +39,43 @@
                         <div class="card h-100 diary-card shadow-sm">
                             <div class="card-body d-flex flex-column">
 
-
                                 <h5 class="card-title">{{ diary.title }}</h5>
-                                <p class="card-text text-muted small">
-                                    Owner: {{ diary.owner.username }}
-                                    {% if diary.owner_id != current_user.id %}
-                                        (Shared)
-                                    {% endif %}
-                                </p>
+
                                 <p class="card-text flex-grow-1 diary-content">
                                     {{ diary.content[:150] }}{% if diary.content|length > 150 %}...{% endif %}</p>
 
                                 {% if diary.analyzed and diary.dominant_emotion_label %}
                                     <p class="card-text mb-2">
-                        <span class="badge rounded-pill
-                                    {% if diary.dominant_emotion_label == 'joy' or diary.dominant_emotion_label == 'love' %} bg-success
-                                    {% elif diary.dominant_emotion_label == 'sadness' or diary.dominant_emotion_label == 'fear' %} bg-info text-dark
-                                    {% elif diary.dominant_emotion_label == 'anger' %} bg-danger
-                                    {% elif diary.dominant_emotion_label == 'surprise' %} bg-warning text-dark
-                                    {% else %} bg-secondary
-                                    {% endif %} emotion-badge">
-                            Emotion: {{ diary.dominant_emotion_label }} ({{ "%.0f"|format(diary.dominant_emotion_score *
-                            100) }}%)
-                        </span>
+                                        <span class="badge rounded-pill
+                                            {% if diary.dominant_emotion_label == 'joy' or diary.dominant_emotion_label == 'love' %} bg-success
+                                            {% elif diary.dominant_emotion_label == 'sadness' or diary.dominant_emotion_label == 'fear' %} bg-info text-dark
+                                            {% elif diary.dominant_emotion_label == 'anger' %} bg-danger
+                                            {% elif diary.dominant_emotion_label == 'surprise' %} bg-warning text-dark
+                                            {% else %} bg-secondary
+                                            {% endif %} emotion-badge">
+                                                Emotion: {{ diary.dominant_emotion_label }} ({{ "%.0f"|format(diary.dominant_emotion_score * 100) }}%)
+                                        </span>
                                     </p>
                                 {% elif diary.analyzed %}
-                                    <p class="card-text mb-2"><span
-                                            class="badge rounded-pill bg-light text-dark emotion-badge">Emotion:
-                            Not Detected</span>
+                                    <p class="card-text mb-2">
+                                        <span class="badge rounded-pill bg-light text-dark emotion-badge">Emotion: Not Detected</span>
                                     </p>
                                 {% else %}
-                                    <p class="card-text mb-2"><span
-                                            class="badge rounded-pill bg-light text-dark emotion-badge">Emotion:
-                            Not Analyzed</span>
+                                    <p class="card-text mb-2">
+                                        <span class="badge rounded-pill bg-light text-dark emotion-badge">Emotion: Not Analyzed</span>
                                     </p>
                                 {% endif %}
 
-                                <p class="card-text mt-auto"><small
-                                        class="text-muted">Created: {{ diary.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                <p class="card-text mt-auto">
+                                    <small class="text-muted">Created: {{ diary.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
                                 </p>
 
                                 <div class="mt-2">
                                     <a href="{{ url_for('data_handling.view_diary', diary_id=diary.id) }}"
-                                       class="btn btn-sm btn-outline-secondary me-1">View Details</a>
+                                       class="btn btn-sm btn-primary">View Details</a>
                                     {% if diary.owner_id == current_user.id %}
                                         <a href="{{ url_for('data_handling.edit_diary', diary_id=diary.id) }}"
-                                           class="btn btn-sm btn-primary">Edit</a>
+                                           class="btn btn-sm btn-outline-secondary me-1">Edit</a>
                                     {% endif %}
                                 </div>
                             </div>
@@ -126,7 +117,7 @@
 
         function filterDiaries() {
             const query = normalize(document.getElementById("searchInput").value);
-            const selectedEmotion = document.getElementById("emotionFilter").value;
+
             const cards = document.querySelectorAll(".diary-card");
 
             let matchCount = 0;
@@ -134,13 +125,8 @@
             cards.forEach(card => {
                 const title = normalize(card.querySelector(".card-title").textContent);
                 const content = normalize(card.querySelector(".diary-content").textContent);
-                const badge = card.querySelector(".emotion-badge");
-                const emotion = badge ? normalize(badge.textContent.split(':')[1]?.split('(')[0] || '') : "";
 
-                const matchesText = title.includes(query) || content.includes(query);
-                const matchesEmotion = !selectedEmotion || emotion.includes(selectedEmotion);
-
-                const isVisible = matchesText && matchesEmotion;
+                const isVisible = title.includes(query) || content.includes(query);
                 card.closest(".col").style.display = isVisible ? "" : "none";
 
                 if (isVisible) matchCount++;
@@ -153,7 +139,26 @@
         }
 
         document.getElementById("searchInput").addEventListener("input", filterDiaries);
-        document.getElementById("emotionFilter").addEventListener("change", filterDiaries);
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const emotionFilterSelect = document.getElementById("emotionFilter");
+
+            if (emotionFilterSelect) {
+                emotionFilterSelect.addEventListener("change", function () {
+                    const selectedEmotion = this.value;
+                    const currentUrl = new URL(window.location.href);
+
+                    if (selectedEmotion) {
+                        currentUrl.searchParams.set("emotion_tag", selectedEmotion);
+                    } else {
+                        currentUrl.searchParams.delete("emotion_tag");
+                    }
+
+                    window.location.href = currentUrl.toString();
+                });
+            }
+        });
     </script>
 {% endblock %}
 
