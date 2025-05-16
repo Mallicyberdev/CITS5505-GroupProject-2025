@@ -32,6 +32,25 @@
             </select>
         </div>
 
+        <div class="container py-4">
+            <!-- Average Mood Index card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Average Mood Index (last 7 days)</h5>
+                    <p class="display-4 mb-0" id="avgMoodIndex">--</p>
+                    <small id="avgMoodDateRange" class="text-muted"></small>
+                </div>
+            </div>
+
+            <!-- Mood Timeline chart -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Mood Timeline</h5>
+                    <canvas id="moodTimelineChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
         {% if diaries %}
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 {% for diary in diaries %}
@@ -160,5 +179,50 @@
             }
         });
     </script>
+    <script>
+        (async () => {
+            /* -------- Fetch mood-timeline data -------- */
+            const timelineResp = await fetch("{{ url_for('data_handling.mood_timeline') }}?days=30");
+            const timelineRows = await timelineResp.json();
+
+            // Build arrays required by Chart.js
+            const dates = [...new Set(timelineRows.map(r => r.date))].sort();
+            const emotions = [...new Set(timelineRows.map(r => r.emotion))];
+
+            const datasets = emotions.map(emotion => {
+                const counts = dates.map(d =>
+                    (timelineRows.find(r => r.date === d && r.emotion === emotion) || {}).count || 0
+                );
+                return {
+                    label: emotion,
+                    data: counts,
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: false
+                };
+            });
+
+            new Chart(
+                document.getElementById("moodTimelineChart").getContext("2d"),
+                {
+                    type: "line",
+                    data: {labels: dates, datasets},
+                    options: {
+                        responsive: true,
+                        scales: {y: {beginAtZero: true, ticks: {precision: 0}}}
+                    }
+                }
+            );
+
+            /* -------- Fetch average-mood-index data -------- */
+            const idxResp = await fetch("{{ url_for('data_handling.average_mood_index') }}");
+            const idxJson = await idxResp.json();
+
+            document.getElementById("avgMoodIndex").textContent = idxJson.average_mood_index;
+            document.getElementById("avgMoodDateRange").textContent =
+                `${idxJson.start} – ${idxJson.end}`;
+        })();
+    </script>
+
 {% endblock %}
 

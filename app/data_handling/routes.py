@@ -9,7 +9,8 @@ implements emotion analysis using transformer models.
 from flask import request, render_template, flash, url_for, jsonify
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
-
+from datetime import datetime, timedelta, timezone
+from sqlalchemy import func, case
 from app import db
 from app.models import User, DiaryEntry
 from . import bp
@@ -22,6 +23,18 @@ emotion_classifier = pipeline(
     model="j-hartmann/emotion-english-distilroberta-base",
     top_k=None,
 )
+
+POSITIVE_EMOTIONS = {
+    "joy",
+    "surprise",
+}
+
+NEGATIVE_EMOTIONS = {
+    "anger",
+    "sadness",
+    "fear",
+    "disgust",
+}
 
 
 @bp.route("/create_diary", methods=["GET", "POST"])
@@ -207,3 +220,106 @@ def get_shared_users(diary_id):
     return jsonify(
         [{"id": user.id, "username": user.username} for user in shared_users]
     )
+
+
+@bp.route("/mood-timeline", methods=["GET"])
+@login_required
+def mood_timeline():
+    """
+    Return a timeline of dominant emotions for the current user.
+
+    Params:
+        days (int, optional): How many days back to include (default: 30).
+
+    Response format:
+        [
+            {"date": "2025-04-16", "emotion": "joy", "count": 2},
+            {"date": "2025-04-16", "emotion": "sadness", "count": 1},
+            ...
+        ]
+    """
+    try:
+        days = int(request.args.get("days", 30))
+    except ValueError:
+        days = 30
+
+    tz = timezone(timedelta(hours=8))  # Australia/Perth (UTC+08:00)
+    start_date = datetime.now(tz).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    ) - timedelta(days=days - 1)
+
+    # Aggregate counts by date and dominant emotion
+    rows = (
+        db.session.query(
+            func.date(DiaryEntry.created_at).label("date"),
+            DiaryEntry.dominant_emotion_label.label("emotion"),
+            func.count().label("count"),
+        )
+        .filter(
+            DiaryEntry.owner_id == current_user.id,
+            DiaryEntry.dominant_emotion_label.isnot(None),
+            DiaryEntry.created_at >= start_date,
+        )
+        .group_by(func.date(DiaryEntry.created_at), DiaryEntry.dominant_emotion_label)
+        .order_by(func.date(DiaryEntry.created_at))
+        .all()
+    )
+
+    # Convert to list of dicts for JSON output
+    data = [
+        {"date": str(row.date), "emotion": row.emotion, "count": row.count}
+        for row in rows
+    ]
+    return jsonify(data)
+
+
+@bp.route("/average-mood-index", methods=["GET"])
+@login_required
+def average_mood_index():
+    """
+    Calculate the average mood index for the last seven days (inclusive).
+
+    Scoring:
+        +1 for emotions in POSITIVE_EMOTIONS
+        -1 for emotions in NEGATIVE_EMOTIONS
+         0 for neutral / unknown
+
+    Response format:
+        {
+            "start": "2025-05-09",
+            "end":   "2025-05-15",
+            "average_mood_index": 0.42
+        }
+    """
+    tz = timezone(timedelta(hours=8))  # Australia/Perth (UTC+08:00)
+    end_date = datetime.now(tz).replace(hour=23, minute=59, second=59, microsecond=0)
+    start_date = end_date - timedelta(days=6)  # last 7 calendar days
+
+    score_expr = case(
+        (
+            DiaryEntry.dominant_emotion_label.in_(POSITIVE_EMOTIONS),
+            1,
+        ),
+        (
+            DiaryEntry.dominant_emotion_label.in_(NEGATIVE_EMOTIONS),
+            -1,
+        ),
+        else_=0,
+    )
+
+    avg_score = (
+        db.session.query(func.avg(score_expr).label("avg_idx"))
+        .filter(
+            DiaryEntry.owner_id == current_user.id,
+            DiaryEntry.dominant_emotion_label.isnot(None),
+            DiaryEntry.created_at.between(start_date, end_date),
+        )
+        .scalar()
+    )
+
+    response = {
+        "start": start_date.date().isoformat(),
+        "end": end_date.date().isoformat(),
+        "average_mood_index": round(avg_score or 0, 2),
+    }
+    return jsonify(response)
