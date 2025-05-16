@@ -50,7 +50,6 @@ form textarea.form-control:focus {
 
 .meta-info {
     font-size: 0.9rem;
-    color: #6c757d;
     color: var(--color-text-light);
 }
 
@@ -70,7 +69,6 @@ form textarea.form-control:focus {
 
 .emotion-details-card {
     background-color: var(--color-card-bg);
-    background-color: var(--color-card-bg);
     color: var(--color-text);
     border-radius: 0.5rem;
     border: 1px solid var(--color-border);
@@ -79,10 +77,8 @@ form textarea.form-control:focus {
 
 /* Share Model for Detail Page */
 .modal-content {
-
     background-color: var(--color-card-bg);
     color: var(--color-text);
-    color: var(--color-text-light);
     border: 1px solid var(--color-border);
 }
 
@@ -135,8 +131,6 @@ form textarea.form-control:focus {
 }
 
 .emotion-badge-btn {
-    /* Add any custom styles here if needed */
-    /* For example, to make it slightly more compact like a badge: */
     padding: 0.25em 0.6em;
     font-size: 0.85em; /* Adjust as needed */
     text-decoration: none; /* Ensure no underline from <a> tag if not desired */
@@ -144,5 +138,27 @@ form textarea.form-control:focus {
 
 .emotion-badge-btn:hover {
     text-decoration: none; /* Ensure no underline on hover */
-    /* Add custom hover effects if Bootstrap defaults aren't enough */
+}
+
+.card-title.text-muted { /* For "Average Mood Index" and "Mood Timeline" titles */
+    font-weight: 500; /* Or your preferred weight */
+    font-size: 0.95rem; /* Slightly smaller */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+#avgMoodIndex {
+    color: var(--color-primary); /* Use theme primary color */
+}
+
+@media (prefers-color-scheme: dark) {
+    #avgMoodIndex {
+        color: var(--color-primary); /* Ensure it's also the dark mode primary */
+    }
+}
+
+.chart-container { /* For mood timeline chart */
+    background-color: var(--color-card-bg);
+    color: var(--color-text);
+    min-height: 250px; /* Ensure space for the chart */
 }
